@@ -1,0 +1,9 @@
+---
+description: Multi-client convention
+alwaysApply: true
+---
+
+Мультиклиентность:
+- Каждый сайт = отдельная папка clients/<client_name>/config.yaml
+- Секреты: только локально (например, .env или clients/<client_name>/.env.local), эти файлы всегда должны быть в .gitignore и .cursorindexingignore.
+- Отчёты/артефакты складывать в reports/ и/или reports/<client_name>/ (если введём позже).

@@ -1,0 +1,23 @@
+# secrets
+.env
+.env.*
+**/.env
+**/.env.*
+*.key
+*.pem
+*.p12
+credentials*.json
+
+# local caches / outputs
+data_cache/
+reports/
+*.sqlite
+*.db
+
+# python / node / ide
+__pycache__/
+.venv/
+node_modules/
+.DS_Store
+.idea/
+.vscode/

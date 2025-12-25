@@ -1,0 +1,12 @@
+site:
+  name: "example.com"
+  timezone: "Europe/Zurich"
+
+metrika:
+  counter_id: 0
+  goal_id: 0
+  currency: "RUB"
+
+reporting:
+  llm_enabled: true
+  language: "ru"
