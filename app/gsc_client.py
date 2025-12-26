@@ -23,13 +23,9 @@ def _get_credentials() -> tuple[str, str]:
     return client_id, refresh_token
 
 
-def _session() -> requests.Session:
-    return get_default_session()
-
-
 def get_sites() -> Mapping[str, object]:
     # Placeholder: real implementation would exchange refresh_token for access_token
     _get_credentials()
-    session = _session()
+    session = get_default_session()
     url = f"{GSC_API}/sites"
     return request_json(session, "GET", url)

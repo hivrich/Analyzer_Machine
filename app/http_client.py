@@ -62,9 +62,16 @@ def _build_proxies(config: HttpConfig) -> MutableMapping[str, str]:
 def get_default_session(config: HttpConfig | None = None) -> requests.Session:
     cfg = config or HttpConfig()
     session = requests.Session()
-    session.trust_env = False
+    # Доверяем окружению: прокси, CA, etc.
+    session.trust_env = True
     session.proxies = _build_proxies(cfg)
     session.headers.update({"User-Agent": "analyzer-machine/1.0"})
+    # Подхватываем пользовательский CA (для MITM‑прокси)
+    session.verify = (
+        os.getenv("REQUESTS_CA_BUNDLE")
+        or os.getenv("SSL_CERT_FILE")
+        or session.verify
+    )
     session.timeout = cfg.timeout  # type: ignore[attr-defined]
     return session
 
