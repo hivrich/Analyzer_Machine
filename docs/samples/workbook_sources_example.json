@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "client": "example_client",
+    "counter_id": 12345678,
+    "p1_start": "2024-01-01",
+    "p1_end": "2024-01-31",
+    "p2_start": "2025-01-01",
+    "p2_end": "2025-01-31",
+    "generated_at": "2025-12-26T12:00:00.000000Z",
+    "limit": 50,
+    "refresh_used": false
+  },
+  "totals": {
+    "total_visits_p1": 50000.0,
+    "total_visits_p2": 40000.0,
+    "total_delta_abs": -10000.0,
+    "total_delta_pct": -20.0
+  },
+  "rows": [
+    {
+      "source": "Search engine traffic",
+      "visits_p1": 40000.0,
+      "visits_p2": 30000.0,
+      "delta_abs": -10000.0,
+      "delta_pct": -25.0,
+      "contribution_pct": 100.0
+    },
+    {
+      "source": "Direct traffic",
+      "visits_p1": 8000.0,
+      "visits_p2": 9000.0,
+      "delta_abs": 1000.0,
+      "delta_pct": 12.5,
+      "contribution_pct": -10.0
+    },
+    {
+      "source": "Internal traffic",
+      "visits_p1": 1500.0,
+      "visits_p2": 800.0,
+      "delta_abs": -700.0,
+      "delta_pct": -46.7,
+      "contribution_pct": 7.0
+    },
+    {
+      "source": "Ad traffic",
+      "visits_p1": 500.0,
+      "visits_p2": 200.0,
+      "delta_abs": -300.0,
+      "delta_pct": -60.0,
+      "contribution_pct": 3.0
+    }
+  ]
+}
+

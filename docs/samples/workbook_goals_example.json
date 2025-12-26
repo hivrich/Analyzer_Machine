@@ -1,0 +1,55 @@
+{
+  "meta": {
+    "client": "example_client",
+    "counter_id": 12345678,
+    "goal_id": 123456,
+    "dimension": "source",
+    "p1_start": "2024-01-01",
+    "p1_end": "2024-01-31",
+    "p2_start": "2025-01-01",
+    "p2_end": "2025-01-31",
+    "generated_at": "2025-12-26T12:00:00.000000Z",
+    "limit": 50,
+    "refresh_used": false
+  },
+  "totals": {
+    "total_visits_p1": 50000.0,
+    "total_visits_p2": 40000.0,
+    "total_goal_visits_p1": 250.0,
+    "total_goal_visits_p2": 200.0,
+    "total_cr_p1": 0.5,
+    "total_cr_p2": 0.5,
+    "total_delta_goal_visits_abs": -50.0,
+    "total_delta_goal_visits_pct": -20.0,
+    "total_delta_cr_pp": 0.0
+  },
+  "rows": [
+    {
+      "source": "Search engine traffic",
+      "visits_p1": 40000.0,
+      "visits_p2": 30000.0,
+      "goal_visits_p1": 200.0,
+      "goal_visits_p2": 150.0,
+      "cr_p1": 0.5,
+      "cr_p2": 0.5,
+      "delta_goal_visits": -50.0,
+      "delta_goal_visits_pct": -25.0,
+      "delta_cr_pp": 0.0,
+      "contribution_pct": 100.0
+    },
+    {
+      "source": "Direct traffic",
+      "visits_p1": 8000.0,
+      "visits_p2": 9000.0,
+      "goal_visits_p1": 40.0,
+      "goal_visits_p2": 45.0,
+      "cr_p1": 0.5,
+      "cr_p2": 0.5,
+      "delta_goal_visits": 5.0,
+      "delta_goal_visits_pct": 12.5,
+      "delta_cr_pp": 0.0,
+      "contribution_pct": -10.0
+    }
+  ]
+}
+

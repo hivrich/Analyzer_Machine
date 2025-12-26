@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "client": "example_client",
+    "counter_id": 12345678,
+    "p1_start": "2024-01-01",
+    "p1_end": "2024-01-31",
+    "p2_start": "2025-01-01",
+    "p2_end": "2025-01-31",
+    "generated_at": "2025-12-26T12:00:00.000000Z",
+    "limit": 50,
+    "refresh_used": false
+  },
+  "totals": {
+    "total_visits_p1": 45000.0,
+    "total_visits_p2": 35000.0,
+    "total_delta_abs": -10000.0,
+    "total_delta_pct": -22.2
+  },
+  "rows": [
+    {
+      "landingPage": "https://example.com/page1",
+      "visits_p1": 10000.0,
+      "visits_p2": 7000.0,
+      "delta_abs": -3000.0,
+      "delta_pct": -30.0,
+      "contribution_pct": 30.0
+    },
+    {
+      "landingPage": "https://example.com/page2",
+      "visits_p1": 8000.0,
+      "visits_p2": 5000.0,
+      "delta_abs": -3000.0,
+      "delta_pct": -37.5,
+      "contribution_pct": 30.0
+    },
+    {
+      "landingPage": "https://example.com/page3",
+      "visits_p1": 5000.0,
+      "visits_p2": 4000.0,
+      "delta_abs": -1000.0,
+      "delta_pct": -20.0,
+      "contribution_pct": 10.0
+    }
+  ]
+}
+

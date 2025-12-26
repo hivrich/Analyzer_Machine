@@ -19,6 +19,9 @@ class ClientConfig:
     currency: str
     llm_enabled: bool
     language: str
+    gsc_site_url: str
+    ym_webmaster_user_id: str
+    ym_webmaster_host_id: str
 
 
 def _read_yaml(path: Path) -> Dict[str, Any]:
@@ -37,6 +40,8 @@ def load_client_config(client_name: str) -> Tuple[ClientConfig, Path]:
     site = raw.get("site") or {}
     metrika = raw.get("metrika") or {}
     reporting = raw.get("reporting") or {}
+    gsc = raw.get("gsc") or {}
+    ym_webmaster = raw.get("ym_webmaster") or {}
 
     site_name = str(site.get("name", "")).strip()
     timezone = str(site.get("timezone", "Europe/Zurich")).strip()
@@ -48,6 +53,10 @@ def load_client_config(client_name: str) -> Tuple[ClientConfig, Path]:
     llm_enabled = bool(reporting.get("llm_enabled", True))
     language = str(reporting.get("language", "ru")).strip()
 
+    gsc_site_url = str(gsc.get("site_url", "")).strip()
+    ym_webmaster_user_id = str(ym_webmaster.get("user_id", "")).strip()
+    ym_webmaster_host_id = str(ym_webmaster.get("host_id", "")).strip()
+
     cfg = ClientConfig(
         client_name=client_name,
         site_name=site_name,
@@ -57,6 +66,9 @@ def load_client_config(client_name: str) -> Tuple[ClientConfig, Path]:
         currency=currency,
         llm_enabled=llm_enabled,
         language=language,
+        gsc_site_url=gsc_site_url,
+        ym_webmaster_user_id=ym_webmaster_user_id,
+        ym_webmaster_host_id=ym_webmaster_host_id,
     )
     return cfg, cfg_path
 

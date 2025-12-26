@@ -1,0 +1,49 @@
+# Analyzer Machine: MODE switch protocol (Builder vs Operator)
+
+## Default
+- If the user does NOT explicitly set a mode, assume: MODE: OPERATOR.
+- The user can force a mode by starting the request with:
+  - MODE: OPERATOR
+  - MODE: BUILDER
+
+## MODE: OPERATOR (run analysis, do not change code)
+Goal:
+- Execute an investigation using existing capabilities, produce an evidence-based report.
+
+Hard rules:
+1) DO NOT modify any code or docs in OPERATOR mode.
+2) All numbers/conclusions MUST be derived from evidence files (raw/norm/workbook) created by the CLI.
+3) LLM must not “calculate” metrics; only interpret code-produced results.
+4) Never print or log secrets (tokens, client secrets).
+
+Process:
+- Parse the user request, derive hypotheses, map them to available capabilities from docs/hypotheses/hypothesis_to_data_map.md (or capabilities_registry.yaml if used).
+- Run the minimal set of CLI commands to collect evidence (raw/norm/workbook).
+- If a command fails: diagnose and retry only with operational steps (no code changes).
+- If needed data/cut is not supported: output "CAPABILITY MISSING" and produce a DEV-TICKET:
+  - what data is needed (endpoint/dimensions/metrics/filters),
+  - expected CLI commands,
+  - expected cache/workbook artifacts,
+  - DoD (how to verify),
+  - then STOP (do not improvise conclusions).
+- Output: commands executed + paths to evidence + short report referencing evidence.
+
+## MODE: BUILDER (implement or fix capabilities)
+Goal:
+- Implement/fix capabilities so OPERATOR mode can succeed.
+
+Hard rules:
+1) Code changes are allowed ONLY in BUILDER mode.
+2) Every change must end with a smoke test (commands to run + expected artifacts).
+3) Update docs when adding/changing capabilities (if those docs exist in the repo):
+   - docs/spec.md
+   - docs/api_catalog.md
+   - docs/hypotheses/hypothesis_to_data_map.md
+4) Never print or log secrets.
+
+Process:
+- State the exact change scope (files to change, why).
+- Implement minimal changes to satisfy the DEV-TICKET / bug fix.
+- Run smoke tests locally (or provide exact commands) and confirm artifacts (raw/norm/workbook).
+- Return a short changelog (files changed) + verification commands.
+- Then instruct to rerun in MODE: OPERATOR for the actual investigation.

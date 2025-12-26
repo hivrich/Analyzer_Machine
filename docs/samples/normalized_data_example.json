@@ -1,0 +1,35 @@
+[
+  {
+    "source": "Search engine traffic",
+    "visits": 40000.0,
+    "users": 35000.0,
+    "bounceRate": 15.5,
+    "pageDepth": 1.4,
+    "avgVisitDurationSeconds": 75.0
+  },
+  {
+    "source": "Direct traffic",
+    "visits": 8000.0,
+    "users": 6000.0,
+    "bounceRate": 12.0,
+    "pageDepth": 1.8,
+    "avgVisitDurationSeconds": 120.0
+  },
+  {
+    "source": "Internal traffic",
+    "visits": 1500.0,
+    "users": 1200.0,
+    "bounceRate": 8.0,
+    "pageDepth": 2.5,
+    "avgVisitDurationSeconds": 180.0
+  },
+  {
+    "source": "Ad traffic",
+    "visits": 500.0,
+    "users": 400.0,
+    "bounceRate": 25.0,
+    "pageDepth": 1.2,
+    "avgVisitDurationSeconds": 45.0
+  }
+]
+
