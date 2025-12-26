@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-import requests
+from app.http_client import get_default_session
 
 
 @dataclass(frozen=True)
@@ -12,27 +12,29 @@ class YMWebmasterClient:
     token: str
     user_id: str
     host_id: str
+    _session: Any = field(default_factory=get_default_session, init=False, repr=False)
 
     def _headers(self) -> Dict[str, str]:
         return {"Authorization": f"OAuth {self.token}"}
 
     def _get(self, url: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        r = requests.get(url, headers=self._headers(), params=params or {}, timeout=60)
+        r = self._session.get(url, headers=self._headers(), params=params or {})
         if r.status_code >= 400:
             raise RuntimeError(f"YM Webmaster API error {r.status_code}: {r.text[:500]} | url={url}")
         return r.json()
 
     def _post(self, url: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         headers = {**self._headers(), "Content-Type": "application/json"}
-        r = requests.post(url, headers=headers, data=json.dumps(payload), timeout=60)
+        r = self._session.post(url, headers=headers, data=json.dumps(payload))
         if r.status_code >= 400:
             raise RuntimeError(f"YM Webmaster API error {r.status_code}: {r.text[:500]} | url={url}")
         return r.json()
 
     @staticmethod
     def list_hosts(token: str) -> Dict[str, Any]:
+        session = get_default_session()
         url = "https://api.webmaster.yandex.net/v4/user"
-        r = requests.get(url, headers={"Authorization": f"OAuth {token}"}, timeout=60)
+        r = session.get(url, headers={"Authorization": f"OAuth {token}"})
         if r.status_code >= 400:
             raise RuntimeError(f"YM Webmaster API error {r.status_code}: {r.text[:500]} | url={url}")
         return r.json()

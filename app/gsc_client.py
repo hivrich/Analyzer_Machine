@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-import requests
+from app.http_client import get_default_session
 
 
 @dataclass(frozen=True)
@@ -13,6 +13,7 @@ class GSCClient:
     client_secret: str
     refresh_token: str
     site_url: str
+    _session: Any = field(default_factory=get_default_session, init=False, repr=False)
 
     def _token(self) -> str:
         """
@@ -25,7 +26,7 @@ class GSCClient:
             "refresh_token": self.refresh_token,
             "grant_type": "refresh_token",
         }
-        r = requests.post(url, data=data, timeout=60)
+        r = self._session.post(url, data=data)
         if r.status_code >= 400:
             raise RuntimeError(f"GSC token error {r.status_code}: {r.text[:500]}")
         js = r.json()
@@ -40,7 +41,7 @@ class GSCClient:
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
         }
-        r = requests.post(url, headers=headers, data=json.dumps(payload), timeout=60)
+        r = self._session.post(url, headers=headers, data=json.dumps(payload))
         if r.status_code >= 400:
             raise RuntimeError(f"GSC API error {r.status_code}: {r.text[:500]} | url={url}")
         return r.json()

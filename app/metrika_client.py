@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from typing import Any, Dict, List, Optional
 from urllib.parse import urlencode
 
-import requests
+from app.http_client import get_default_session
 
 
 TRAFFIC_SOURCE_NAME_TO_ID: Dict[str, str] = {
@@ -27,12 +27,13 @@ TRAFFIC_SOURCE_NAME_TO_ID: Dict[str, str] = {
 class MetrikaClient:
     token: str
     counter_id: int
+    _session: Any = field(default_factory=get_default_session, init=False, repr=False)
 
     def _headers(self) -> Dict[str, str]:
         return {"Authorization": f"OAuth {self.token}"}
 
     def _get(self, url: str, params: Dict[str, Any]) -> Dict[str, Any]:
-        r = requests.get(url, headers=self._headers(), params=params, timeout=60)
+        r = self._session.get(url, headers=self._headers(), params=params)
         if r.status_code >= 400:
             raise RuntimeError(
                 f"Metrika API error {r.status_code}: {r.text[:500]} | url={url}?{urlencode(params)}"
@@ -40,7 +41,7 @@ class MetrikaClient:
         return r.json()
 
     def _get_no_params(self, url: str) -> Dict[str, Any]:
-        r = requests.get(url, headers=self._headers(), timeout=60)
+        r = self._session.get(url, headers=self._headers())
         if r.status_code >= 400:
             raise RuntimeError(f"Metrika API error {r.status_code}: {r.text[:500]} | url={url}")
         return r.json()

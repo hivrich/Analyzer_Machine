@@ -3,10 +3,18 @@ site:
   timezone: "Europe/Zurich"
 
 metrika:
-  counter_id: 0
+  counter_id: 41010869
   goal_id: 0
   currency: "RUB"
 
 reporting:
   llm_enabled: true
   language: "ru"
+
+ym_webmaster:
+  user_id: 44806260
+  host_id: "https:partacademy.ru:443"
+
+gsc:
+  site_url: "https://partacademy.ru/"
+

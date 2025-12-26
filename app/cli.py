@@ -842,12 +842,13 @@ def ym_webmaster_hosts_cmd(
 
     if normalized is None:
         try:
-            import requests
+            from app.http_client import get_default_session
 
+            session = get_default_session()
             headers = {"Authorization": f"OAuth {token}"}
 
             # 1) user_id
-            r_user = requests.get("https://api.webmaster.yandex.net/v4/user", headers=headers, timeout=30)
+            r_user = session.get("https://api.webmaster.yandex.net/v4/user", headers=headers)
             if r_user.status_code >= 400:
                 raise RuntimeError(f"{r_user.status_code}: {r_user.text}")
             user_json = r_user.json()
@@ -856,10 +857,9 @@ def ym_webmaster_hosts_cmd(
                 raise RuntimeError(f"Unexpected /v4/user response: {user_json}")
 
             # 2) hosts
-            r_hosts = requests.get(
+            r_hosts = session.get(
                 f"https://api.webmaster.yandex.net/v4/user/{user_id}/hosts",
                 headers=headers,
-                timeout=30,
             )
             if r_hosts.status_code >= 400:
                 raise RuntimeError(f"{r_hosts.status_code}: {r_hosts.text}")
