@@ -1,21 +1,102 @@
-"""
-HTTP client helper with proxy support.
+"""HTTP helpers with proxy and timeout support.
 
-Handles HTTP_PROXY, HTTPS_PROXY, NO_PROXY environment variables.
-Allows bypassing proxy for specific hosts (e.g., api-metrika.yandex.net).
+This module centralizes session construction so all API clients can:
+- respect HTTP(S)_PROXY while allowing per-host bypass via NO_PROXY
+- share a retry-friendly requests.Session with sensible defaults
 """
+
 from __future__ import annotations
 
 import os
-from typing import Optional
+from dataclasses import dataclass
+from typing import Iterable, Mapping, MutableMapping, Optional, Sequence
 from urllib.parse import urlparse
 
 import requests
 
 
+DEFAULT_TIMEOUT = 30
+
+# Domains that frequently require direct access without the corporate proxy.
+DEFAULT_NO_PROXY_HOSTS: tuple[str, ...] = (
+    "api-metrika.yandex.net",
+    "api-metrika.yandex.ru",
+    "api-metrika.yandex.com",
+    "api.webmaster.yandex.net",
+    "api.webmaster.yandex.ru",
+    "api.searchconsole.googleapis.com",
+    "searchconsole.googleapis.com",
+    "oauth2.googleapis.com",
+    "www.googleapis.com",
+)
+
+
+@dataclass(frozen=True)
+class HttpConfig:
+    timeout: int = DEFAULT_TIMEOUT
+    extra_no_proxy: Sequence[str] | None = None
+
+
+def _merge_no_proxy(env_value: str | None, extra_hosts: Iterable[str]) -> str:
+    hosts = [] if not env_value else [h.strip() for h in env_value.split(",") if h.strip()]
+    for host in extra_hosts:
+        if host and host not in hosts:
+            hosts.append(host)
+    return ",".join(hosts)
+
+
+def _build_proxies(config: HttpConfig) -> MutableMapping[str, str]:
+    proxies: MutableMapping[str, str] = {}
+    http_proxy = os.getenv("HTTP_PROXY") or os.getenv("http_proxy")
+    https_proxy = os.getenv("HTTPS_PROXY") or os.getenv("https_proxy")
+
+    if http_proxy:
+        proxies["http"] = http_proxy
+    if https_proxy:
+        proxies["https"] = https_proxy
+
+    merged_no_proxy = _merge_no_proxy(os.getenv("NO_PROXY") or os.getenv("no_proxy"), DEFAULT_NO_PROXY_HOSTS)
+    if config.extra_no_proxy:
+        merged_no_proxy = _merge_no_proxy(merged_no_proxy, config.extra_no_proxy)
+
+    proxies["no_proxy"] = merged_no_proxy
+    return proxies
+
+
+def get_default_session(config: HttpConfig | None = None) -> requests.Session:
+    """
+    Get a session with default no-proxy hosts for Yandex/Google APIs.
+
+    This is useful when proxy blocks these domains (e.g., 403 CONNECT).
+    """
+    cfg = config or HttpConfig()
+    session = requests.Session()
+    # Доверяем окружению: прокси, CA, etc.
+    session.trust_env = True
+    session.proxies = _build_proxies(cfg)
+    session.headers.update({"User-Agent": "analyzer-machine/1.0"})
+    # Подхватываем пользовательский CA (для MITM‑прокси)
+    session.verify = (
+        os.getenv("REQUESTS_CA_BUNDLE")
+        or os.getenv("SSL_CERT_FILE")
+        or session.verify
+    )
+    session.timeout = cfg.timeout  # type: ignore[attr-defined]
+    return session
+
+
+def request_json(session: requests.Session, method: str, url: str, **kwargs) -> Mapping[str, object]:
+    """Helper to make a request and return JSON."""
+    timeout = kwargs.pop("timeout", getattr(session, "timeout", DEFAULT_TIMEOUT))
+    response = session.request(method=method, url=url, timeout=timeout, **kwargs)
+    response.raise_for_status()
+    return response.json()
+
+
+# Backward compatibility: keep the old function signature
 def get_session(no_proxy_hosts: Optional[list[str]] = None) -> requests.Session:
     """
-    Create a requests.Session with proxy configuration.
+    Create a requests.Session with proxy configuration (legacy function).
 
     Args:
         no_proxy_hosts: List of hostnames to bypass proxy for (e.g., ['api-metrika.yandex.net'])
@@ -23,75 +104,6 @@ def get_session(no_proxy_hosts: Optional[list[str]] = None) -> requests.Session:
     Returns:
         Configured requests.Session
     """
-    session = requests.Session()
-    session.timeout = 60
-
-    # Get proxy settings from environment
-    http_proxy = os.getenv("HTTP_PROXY") or os.getenv("http_proxy")
-    https_proxy = os.getenv("HTTPS_PROXY") or os.getenv("https_proxy")
-    no_proxy = os.getenv("NO_PROXY") or os.getenv("no_proxy", "")
-
-    # Build no_proxy list
-    no_proxy_list = []
-    if no_proxy:
-        no_proxy_list.extend([h.strip() for h in no_proxy.split(",") if h.strip()])
-    if no_proxy_hosts:
-        no_proxy_list.extend(no_proxy_hosts)
-
-    # Configure proxies
-    proxies = {}
-    if http_proxy:
-        proxies["http"] = http_proxy
-    if https_proxy:
-        proxies["https"] = https_proxy
-
-    # If we have no_proxy hosts, we need to check each request
-    if no_proxy_list:
-        # Store original request method
-        original_request = session.request
-
-        def request_with_no_proxy(method, url, **kwargs):
-            parsed = urlparse(url)
-            host = parsed.hostname or ""
-
-            # Check if host should bypass proxy
-            should_bypass = False
-            for np_host in no_proxy_list:
-                if np_host in host or host.endswith("." + np_host):
-                    should_bypass = True
-                    break
-
-            # Temporarily remove proxies for this request if bypassing
-            if should_bypass:
-                kwargs["proxies"] = {}
-            else:
-                kwargs["proxies"] = proxies
-
-            return original_request(method, url, **kwargs)
-
-        session.request = request_with_no_proxy
-    else:
-        # No no_proxy list, use proxies for all requests
-        session.proxies = proxies
-
-    return session
-
-
-# Default no-proxy hosts for Yandex APIs (common case)
-DEFAULT_NO_PROXY_HOSTS = [
-    "api-metrika.yandex.net",
-    "api-metrika.yandex.ru",
-    "api.webmaster.yandex.net",
-    "oauth2.googleapis.com",
-    "www.googleapis.com",
-]
-
-
-def get_default_session() -> requests.Session:
-    """
-    Get a session with default no-proxy hosts for Yandex/Google APIs.
-
-    This is useful when proxy blocks these domains (e.g., 403 CONNECT).
-    """
-    return get_session(no_proxy_hosts=DEFAULT_NO_PROXY_HOSTS)
-
+    extra_no_proxy = list(no_proxy_hosts) if no_proxy_hosts else None
+    config = HttpConfig(extra_no_proxy=extra_no_proxy)
+    return get_default_session(config)

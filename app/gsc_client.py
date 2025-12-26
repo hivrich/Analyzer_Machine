@@ -3,7 +3,8 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
-from urllib.parse import quote
+
+import requests
 
 from app.http_client import get_default_session
 
@@ -61,7 +62,7 @@ class GSCClient:
         Search Analytics query.
         Docs: sites/{siteUrl}/searchAnalytics/query
         """
-        site = quote(self.site_url, safe="")
+        site = requests.utils.quote(self.site_url, safe="")
         url = f"https://www.googleapis.com/webmasters/v3/sites/{site}/searchAnalytics/query"
         payload: Dict[str, Any] = {
             "startDate": date1,
