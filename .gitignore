@@ -11,6 +11,8 @@ credentials*.json
 # local caches / outputs
 data_cache/
 reports/
+# Allow docs/reports/ for GitHub Pages
+!docs/reports/
 *.sqlite
 *.db
 
