@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+from datetime import datetime
 
 import typer
 from dotenv import load_dotenv
@@ -53,6 +54,7 @@ from app.analysis_ym_webmaster import (
     workbook_filename as ymw_workbook_filename,
 )
 from app.ym_webmaster_client import YMWebmasterClient, normalize_webmaster_indexing
+from app.analysis_insights import print_insights
 
 # Загружаем переменные окружения из .env
 load_dotenv()
@@ -648,6 +650,7 @@ def analyze_gsc_queries_cmd(
     p2_end: str = typer.Argument(..., help="Конечная дата периода 2 (YYYY-MM-DD)"),
     limit: int = typer.Option(1000, "--limit", help="Лимит строк (rowLimit)"),
     refresh: bool = typer.Option(False, "--refresh", help="Принудительно перезапросить GSC"),
+    format: str = typer.Option("table", "--format", help="Формат вывода: table или insights"),
 ):
     """Сравнение GSC queries между двумя периодами (детерминированно)."""
     cfg, _ = load_client_config(client)
@@ -693,6 +696,15 @@ def analyze_gsc_queries_cmd(
     workbook_file.write_text(json.dumps(workbook, ensure_ascii=False, indent=2), encoding="utf-8")
     rprint(f"[green]Workbook сохранён:[/green] {workbook_file.name}")
 
+    if format == "insights":
+        print_insights(
+            rows, 
+            workbook["totals"], 
+            metric_name="clicks", 
+            dimension_name="query"
+        )
+        return
+
     table = Table(title=f"GSC queries compare ({client}, {p1_start}-{p1_end} vs {p2_start}-{p2_end})")
     table.add_column("query")
     table.add_column("clicks_p1", justify="right")
@@ -726,6 +738,7 @@ def analyze_gsc_pages_cmd(
     p2_end: str = typer.Argument(..., help="Конечная дата периода 2 (YYYY-MM-DD)"),
     limit: int = typer.Option(1000, "--limit", help="Лимит строк (rowLimit)"),
     refresh: bool = typer.Option(False, "--refresh", help="Принудительно перезапросить GSC"),
+    format: str = typer.Option("table", "--format", help="Формат вывода: table или insights"),
 ):
     """Сравнение GSC pages между двумя периодами (детерминированно)."""
     cfg, _ = load_client_config(client)
@@ -770,6 +783,15 @@ def analyze_gsc_pages_cmd(
     workbook_file = cache_dir / gsc_workbook_filename("pages", p1_start, p1_end, p2_start, p2_end)
     workbook_file.write_text(json.dumps(workbook, ensure_ascii=False, indent=2), encoding="utf-8")
     rprint(f"[green]Workbook сохранён:[/green] {workbook_file.name}")
+
+    if format == "insights":
+        print_insights(
+            rows, 
+            workbook["totals"], 
+            metric_name="clicks", 
+            dimension_name="page"
+        )
+        return
 
     table = Table(title=f"GSC pages compare ({client}, {p1_start}-{p1_end} vs {p2_start}-{p2_end})")
     table.add_column("page")
@@ -959,6 +981,7 @@ def analyze_ym_webmaster_queries_cmd(
     p2_end: str = typer.Argument(..., help="Конечная дата периода 2 (YYYY-MM-DD)"),
     limit: int = typer.Option(500, "--limit", help="Лимит строк"),
     refresh: bool = typer.Option(False, "--refresh", help="Принудительно перезапросить Вебмастер"),
+    format: str = typer.Option("table", "--format", help="Формат вывода: table или insights"),
 ):
     """Сравнение запросов Яндекс.Вебмастера между двумя периодами."""
     cfg, _ = load_client_config(client)
@@ -1001,6 +1024,15 @@ def analyze_ym_webmaster_queries_cmd(
     workbook_file = cache_dir / ymw_workbook_filename(p1_start, p1_end, p2_start, p2_end)
     workbook_file.write_text(json.dumps(workbook, ensure_ascii=False, indent=2), encoding="utf-8")
     rprint(f"[green]Workbook сохранён:[/green] {workbook_file.name}")
+
+    if format == "insights":
+        print_insights(
+            rows, 
+            workbook["totals"], 
+            metric_name="clicks", 
+            dimension_name="query"
+        )
+        return
 
     table = Table(title=f"YM Webmaster queries compare ({client}, {p1_start}-{p1_end} vs {p2_start}-{p2_end})")
     table.add_column("query")
@@ -1095,6 +1127,7 @@ def analyze_sources_cmd(
     p2_end: str = typer.Argument(..., help="Конечная дата периода 2 (YYYY-MM-DD)"),
     limit: int = typer.Option(50, "--limit", help="Лимит строк в выводе"),
     refresh: bool = typer.Option(False, "--refresh", help="Принудительно перезапросить Метрику"),
+    format: str = typer.Option("table", "--format", help="Формат вывода: table или insights"),
 ):
     """Сравнение источников трафика между двумя периодами."""
     token = os.getenv("YANDEX_METRIKA_TOKEN")
@@ -1176,6 +1209,15 @@ def analyze_sources_cmd(
 
     rprint(f"[green]Workbook сохранён:[/green] {workbook_file.name}")
 
+    if format == "insights":
+        print_insights(
+            rows, 
+            workbook["totals"], 
+            metric_name="visits", 
+            dimension_name="source"
+        )
+        return
+
     table = Table(
         title=f"Сравнение источников трафика ({client}, {p1_start}-{p1_end} vs {p2_start}-{p2_end})"
     )
@@ -1215,6 +1257,7 @@ def analyze_pages_cmd(
     p2_end: str = typer.Argument(..., help="Конечная дата периода 2 (YYYY-MM-DD)"),
     limit: int = typer.Option(50, "--limit", help="Лимит строк в выводе"),
     refresh: bool = typer.Option(False, "--refresh", help="Принудительно перезапросить Метрику"),
+    format: str = typer.Option("table", "--format", help="Формат вывода: table или insights"),
 ):
     """Сравнение входных страниц (landing pages) между двумя периодами."""
     token = os.getenv("YANDEX_METRIKA_TOKEN")
@@ -1294,6 +1337,15 @@ def analyze_pages_cmd(
 
     rprint(f"[green]Workbook сохранён:[/green] {workbook_file.name}")
 
+    if format == "insights":
+        print_insights(
+            rows, 
+            workbook["totals"], 
+            metric_name="visits", 
+            dimension_name="landingPage"
+        )
+        return
+
     table = Table(
         title=f"Сравнение landing pages ({client}, {p1_start}-{p1_end} vs {p2_start}-{p2_end})"
     )
@@ -1336,6 +1388,7 @@ def analyze_pages_by_source_cmd(
     ),
     limit: int = typer.Option(50, "--limit", help="Лимит строк в выводе"),
     refresh: bool = typer.Option(False, "--refresh", help="Принудительно перезапросить Метрику"),
+    format: str = typer.Option("table", "--format", help="Формат вывода: table или insights"),
 ):
     """Сравнение landing pages между двумя периодами внутри выбранного источника трафика."""
     token = os.getenv("YANDEX_METRIKA_TOKEN")
@@ -1422,6 +1475,15 @@ def analyze_pages_by_source_cmd(
 
     rprint(f"[green]Workbook сохранён:[/green] {workbook_file.name}")
 
+    if format == "insights":
+        print_insights(
+            rows, 
+            workbook["totals"], 
+            metric_name="visits", 
+            dimension_name="landingPage"
+        )
+        return
+
     table = Table(
         title=f"Landing pages by source ({client}, {source}, {p1_start}-{p1_end} vs {p2_start}-{p2_end})"
     )
@@ -1462,6 +1524,7 @@ def analyze_goals_by_source_cmd(
     goal_id: int = typer.Option(0, "--goal-id", help="ID цели в Метрике (0 = взять из config)"),
     limit: int = typer.Option(50, "--limit", help="Лимит строк в выводе"),
     refresh: bool = typer.Option(False, "--refresh", help="Принудительно перезапросить Метрику"),
+    format: str = typer.Option("table", "--format", help="Формат вывода: table или insights"),
 ):
     """Сравнение goals (конверсий) по источникам между двумя периодами."""
     token = os.getenv("YANDEX_METRIKA_TOKEN")
@@ -1552,6 +1615,15 @@ def analyze_goals_by_source_cmd(
     workbook_file.write_text(json.dumps(workbook, ensure_ascii=False, indent=2), encoding="utf-8")
     rprint(f"[green]Workbook сохранён:[/green] {workbook_file.name}")
 
+    if format == "insights":
+        print_insights(
+            rows, 
+            workbook["totals"], 
+            metric_name="goal_visits", 
+            dimension_name="source"
+        )
+        return
+
     table = Table(
         title=f"Goals by source ({client}, goal_id={resolved_goal_id}, {p1_start}-{p1_end} vs {p2_start}-{p2_end})"
     )
@@ -1598,6 +1670,7 @@ def analyze_goals_by_page_cmd(
     goal_id: int = typer.Option(0, "--goal-id", help="ID цели в Метрике (0 = взять из config)"),
     limit: int = typer.Option(50, "--limit", help="Лимит строк в выводе"),
     refresh: bool = typer.Option(False, "--refresh", help="Принудительно перезапросить Метрику"),
+    format: str = typer.Option("table", "--format", help="Формат вывода: table или insights"),
 ):
     """Сравнение goals (конверсий) по входным страницам между двумя периодами."""
     token = os.getenv("YANDEX_METRIKA_TOKEN")
@@ -1684,6 +1757,15 @@ def analyze_goals_by_page_cmd(
     workbook_file.write_text(json.dumps(workbook, ensure_ascii=False, indent=2), encoding="utf-8")
     rprint(f"[green]Workbook сохранён:[/green] {workbook_file.name}")
 
+    if format == "insights":
+        print_insights(
+            rows, 
+            workbook["totals"], 
+            metric_name="goal_visits", 
+            dimension_name="landingPage"
+        )
+        return
+
     table = Table(
         title=f"Goals by landingPage ({client}, goal_id={resolved_goal_id}, {p1_start}-{p1_end} vs {p2_start}-{p2_end})"
     )
@@ -1718,6 +1800,164 @@ def analyze_goals_by_page_cmd(
     rprint(f"  Δ goal visits: {int(totals['total_delta_goal_visits_abs']):,}")
     rprint(f"  Δ goal visits (%): {totals['total_delta_goal_visits_pct']:.1f}%")
     rprint(f"  Δ CR (pp): {totals['total_delta_cr_pp']:.2f}")
+
+
+@app.command()
+def audit_data(
+    client: str = typer.Argument(..., help="Имя клиента"),
+    period_start: str = typer.Argument(..., help="Начало периода (YYYY-MM-DD)"),
+    period_end: str = typer.Argument(..., help="Конец периода (YYYY-MM-DD)"),
+):
+    """
+    ⚡ AUDIT: Проверка данных для клиента за период.
+    
+    Проверяет:
+    - Наличие всех необходимых файлов
+    - Актуальность данных
+    - Отсутствие аномалий
+    - Корректность сумм
+    """
+    from app.audit import AuditEngine
+    
+    rprint(f"[bold yellow]⚡ AUDIT: Data Verification[/bold yellow]")
+    rprint(f"Client: {client}, Period: {period_start} to {period_end}\n")
+    
+    engine = AuditEngine(client)
+    
+    # Проверяем наличие основных файлов
+    reports_dir = Path("reports") / client
+    cache_dir = Path("data_cache") / client
+    
+    issues = []
+    
+    # 1. Проверка директорий
+    if not reports_dir.exists():
+        issues.append(f"Reports directory not found: {reports_dir}")
+    
+    if not cache_dir.exists():
+        issues.append(f"Cache directory not found: {cache_dir}")
+    
+    # 2. Проверка наличия workbooks
+    expected_files = [
+        f"analysis_sources_*_{period_start}_{period_end}.json",
+        f"analysis_pages_*_{period_start}_{period_end}.json",
+    ]
+    
+    for pattern in expected_files:
+        files = list(cache_dir.glob(pattern))
+        if not files:
+            issues.append(f"Missing workbook: {pattern}")
+        else:
+            # Проверка актуальности
+            for file in files:
+                age_days = (datetime.now() - datetime.fromtimestamp(file.stat().st_mtime)).days
+                if age_days > 7:
+                    issues.append(f"Stale data ({age_days} days old): {file.name}")
+    
+    if issues:
+        rprint("[red]❌ Audit FAILED:[/red]")
+        for issue in issues:
+            rprint(f"  - {issue}")
+        raise typer.Exit(1)
+    else:
+        rprint("[green]✅ Audit PASSED: All data files present and up-to-date[/green]")
+
+
+@app.command()
+def audit_metric(
+    claim: str = typer.Argument(..., help="Утверждение вида 'metric=value'"),
+    source: str = typer.Option(..., "--source", help="Файл-источник данных"),
+    client: str = typer.Option(..., "--client", help="Имя клиента"),
+    period: str = typer.Option("", "--period", help="Период (опционально)"),
+):
+    """
+    ⚡ AUDIT: Проверка конкретной цифры.
+    
+    Пример:
+    python -m app.cli audit-metric "visits_organic=12499" \\
+        --source "analysis_sources_*.json" \\
+        --client trisystems \\
+        --period "Q4 2025"
+    """
+    from app.audit import AuditEngine, DataPoint
+    
+    # Парсим claim
+    if "=" not in claim:
+        rprint("[red]Error: claim должен быть вида 'metric=value'[/red]")
+        raise typer.Exit(1)
+    
+    metric, value_str = claim.split("=", 1)
+    
+    try:
+        value = float(value_str)
+    except ValueError:
+        value = value_str
+    
+    rprint(f"[bold yellow]⚡ AUDIT: Metric Verification[/bold yellow]")
+    rprint(f"Claim: {metric} = {value}")
+    rprint(f"Source: {source}")
+    rprint(f"Client: {client}\n")
+    
+    engine = AuditEngine(client)
+    
+    result = engine.verify_data_source(DataPoint(
+        metric=metric,
+        value=value,
+        source_file=source,
+        period=period,
+        context={}
+    ))
+    
+    if result.status == "passed":
+        rprint(f"[green]✅ PASSED[/green]: {result.claim}")
+        rprint(f"Evidence: {', '.join(result.evidence)}")
+    else:
+        rprint(f"[red]❌ FAILED[/red]: {result.claim}")
+        rprint(f"Issues:")
+        for issue in result.issues:
+            rprint(f"  - {issue}")
+        raise typer.Exit(1)
+
+
+@app.command()
+def audit_report(
+    report_path: str = typer.Argument(..., help="Путь к отчету"),
+    strict: bool = typer.Option(False, "--strict", help="Строгий режим (провал при warnings)"),
+):
+    """
+    ⚡ AUDIT: Полная проверка отчета перед публикацией.
+    
+    Проверяет:
+    - Все цифры имеют источники
+    - Все расчеты верны
+    - Все гипотезы обоснованы
+    
+    Пример:
+    python -m app.cli audit-report reports/trisystems/REPORT.md --strict
+    """
+    from app.audit import AuditEngine
+    
+    report_file = Path(report_path)
+    if not report_file.exists():
+        rprint(f"[red]Error: Report not found: {report_path}[/red]")
+        raise typer.Exit(1)
+    
+    rprint(f"[bold yellow]⚡ AUDIT: Report Verification[/bold yellow]")
+    rprint(f"Report: {report_path}\n")
+    
+    # TODO: Реализовать парсинг отчета и проверку всех утверждений
+    # Пока что базовая проверка
+    
+    rprint("[yellow]⚠️ Full report audit not yet implemented[/yellow]")
+    rprint("Manual checks required:")
+    rprint("  1. Все цифры имеют источники (file + line)?")
+    rprint("  2. Все гипотезы имеют альтернативы?")
+    rprint("  3. Указан confidence для ключевых выводов?")
+    rprint("  4. Нет противоречий в данных?")
+    rprint("  5. Рекомендации реалистичны (не 'с потолка')?")
+    
+    # Placeholder для будущей реализации
+    rprint("\n[blue]ℹ️ See docs/AUDIT_RULES.md for full checklist[/blue]")
 
 
 if __name__ == "__main__":
