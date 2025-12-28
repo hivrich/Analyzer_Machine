@@ -1,0 +1,20 @@
+site:
+  name: "makevibe.ru"
+  timezone: "Europe/Moscow"
+
+metrika:
+  counter_id: 73711258
+  goal_id: 0
+  currency: "RUB"
+
+reporting:
+  llm_enabled: true
+  language: "ru"
+
+ym_webmaster:
+  user_id: ""
+  host_id: ""
+
+gsc:
+  site_url: "https://makevibe.ru/"
+
