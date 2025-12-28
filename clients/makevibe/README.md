@@ -42,9 +42,10 @@
 - **Note:** Сайт добавлен как "Доменный ресурс" (не URL prefix)
 
 ### Yandex Webmaster
-- **User ID:** Not configured
-- **Host ID:** Not configured
-- **Status:** Not configured (нужны учетные данные)
+- **User ID:** 44806260
+- **Host ID:** https:makevibe.ru:443
+- **Status:** ✅ Configured (но API возвращает 405 error)
+- **Note:** Сайт verified в Вебмастере, но API queries endpoint недоступен
 
 ---
 

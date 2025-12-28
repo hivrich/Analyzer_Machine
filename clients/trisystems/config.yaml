@@ -1,9 +1,9 @@
 site:
-  name: "makevibe.ru"
+  name: "trisystems.ru"
   timezone: "Europe/Moscow"
 
 metrika:
-  counter_id: 73711258
+  counter_id: 70863205
   goal_id: 0
   currency: "RUB"
 
@@ -12,9 +12,10 @@ reporting:
   language: "ru"
 
 ym_webmaster:
-  user_id: "44806260"
-  host_id: "https:makevibe.ru:443"
+  user_id: 44806260
+  host_id: "https:trisystems.ru:443"
 
 gsc:
-  site_url: "sc-domain:makevibe.ru"
+  site_url: "https://trisystems.ru/"
+
 
