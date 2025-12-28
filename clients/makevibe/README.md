@@ -38,7 +38,9 @@
 
 ### Google Search Console
 - **Site URL:** https://makevibe.ru/
-- **Status:** Not configured (нужны учетные данные)
+- **Status:** ⚠️ No access (credentials OK, но нет прав на сайт)
+- **Action required:** Добавить Google аккаунт в Search Console для makevibe.ru
+- **См. инструкцию:** `clients/makevibe/GSC_SETUP.md`
 
 ### Yandex Webmaster
 - **User ID:** Not configured
