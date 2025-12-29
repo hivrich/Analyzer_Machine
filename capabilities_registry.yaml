@@ -1,437 +1,426 @@
-# Capability Registry — реестр возможностей для Analyzer Machine Agent
-
-version: "1.0"
-updated: "2025-12-26"
-
-# Определение capability
-# - id: уникальный идентификатор
-# - name: человеко-читаемое имя
-# - status: implemented / planned_tier1 / planned_tier2 / planned_tier3 / not_planned
-# - command_template: шаблон CLI команды ({} = параметры)
-# - artifacts: список артефактов (workbook, cache), которые создаются
-# - checks_hypotheses: список ID гипотез, которые можно проверить
-# - priority: числовой приоритет (чем меньше, тем раньше выполнять)
-# - depends_on: список ID capabilities-зависимостей
-
+version: '1.0'
+updated: '2025-12-26'
 capabilities:
-  # ============================================================
-  # TIER 0: Implemented (уже есть)
-  # ============================================================
-  
-  - id: C1
-    name: "Sources Period Compare"
-    description: "Сравнение источников трафика между двумя периодами"
-    status: implemented
-    tier: 0
-    command_template: "python -m app.cli analyze-sources {client} {p1_start} {p1_end} {p2_start} {p2_end} --limit {limit}"
-    artifacts:
-      - "data_cache/{client}/metrika_sources_raw_{p1_start}_{p1_end}.json"
-      - "data_cache/{client}/metrika_sources_norm_{p1_start}_{p1_end}.json"
-      - "data_cache/{client}/metrika_sources_raw_{p2_start}_{p2_end}.json"
-      - "data_cache/{client}/metrika_sources_norm_{p2_start}_{p2_end}.json"
-      - "data_cache/{client}/analysis_sources_{p1_slug}{p2_slug}.json"
-    checks_hypotheses:
-      - H1.1
-      - H1.2
-      - H1.3
-      - H1.4
-      - H1.5
-      - H1.6
-      - S1
-      - S2
-    checks_signals:
-      - S1
-      - S2
-    priority: 1
-    depends_on: []
-    data_source: "yandex_metrika"
-    
-  # ============================================================
-  # TIER 1: Critical (критично для профессионального анализа)
-  # ============================================================
-  
-  - id: C2.1
-    name: "Landing Pages by Source"
-    description: "Анализ входных страниц в сегменте конкретного источника (напр., только органика)"
-    status: planned_tier1
-    tier: 1
-    command_template: "python -m app.cli analyze-pages-by-source {client} {p1_start} {p1_end} {p2_start} {p2_end} --source '{source}' --limit {limit}"
-    artifacts:
-      - "data_cache/{client}/metrika_pages_by_source_raw_{source_slug}_{p1_start}_{p1_end}.json"
-      - "data_cache/{client}/metrika_pages_by_source_norm_{source_slug}_{p1_start}_{p1_end}.json"
-      - "data_cache/{client}/metrika_pages_by_source_raw_{source_slug}_{p2_start}_{p2_end}.json"
-      - "data_cache/{client}/metrika_pages_by_source_norm_{source_slug}_{p2_start}_{p2_end}.json"
-      - "data_cache/{client}/analysis_pages_by_source_{source_slug}_{p1_slug}{p2_slug}.json"
-    checks_hypotheses:
-      - H2.1
-      - H5.1
-      - S2
-      - S5
-    checks_signals:
-      - S2
-      - S5
-    priority: 2
-    depends_on:
-      - C1
-    data_source: "yandex_metrika"
-    implementation_notes: |
-      - Использовать filters=ym:s:lastTrafficSource=='{source}'
-      - source_slug: slugify(source) для имени файла
-      - Аналогично analyze-sources, но с фильтром
-    
-  - id: C5.1
-    name: "GSC Queries Analysis"
-    description: "Анализ запросов Google Search Console: клики, показы, CTR, позиции"
-    status: planned_tier1
-    tier: 1
-    command_template: "python -m app.cli analyze-gsc-queries {client} {p1_start} {p1_end} {p2_start} {p2_end} --limit {limit}"
-    artifacts:
-      - "data_cache/{client}/gsc_queries_raw_{p1_start}_{p1_end}.json"
-      - "data_cache/{client}/gsc_queries_norm_{p1_start}_{p1_end}.json"
-      - "data_cache/{client}/gsc_queries_raw_{p2_start}_{p2_end}.json"
-      - "data_cache/{client}/gsc_queries_norm_{p2_start}_{p2_end}.json"
-      - "data_cache/{client}/analysis_gsc_queries_{p1_slug}{p2_slug}.json"
-    checks_hypotheses:
-      - H2.2
-      - H2.3
-      - H2.4
-      - H3.1
-      - H3.2
-      - S2
-      - S3
-    checks_signals:
-      - S2
-      - S3
-    priority: 3
-    depends_on:
-      - C2.1
-    data_source: "google_search_console"
-    implementation_notes: |
-      - Требует OAuth 2.0 (GSC_CLIENT_ID, GSC_CLIENT_SECRET, GSC_REFRESH_TOKEN)
-      - Dimensions: query
-      - Metrics: clicks, impressions, ctr, position
-      - rowLimit: 1000 по умолчанию
-    
-  - id: C5.2
-    name: "GSC Pages Analysis"
-    description: "Анализ страниц Google Search Console: клики, показы, CTR, позиции"
-    status: planned_tier1
-    tier: 1
-    command_template: "python -m app.cli analyze-gsc-pages {client} {p1_start} {p1_end} {p2_start} {p2_end} --limit {limit}"
-    artifacts:
-      - "data_cache/{client}/gsc_pages_raw_{p1_start}_{p1_end}.json"
-      - "data_cache/{client}/gsc_pages_norm_{p1_start}_{p1_end}.json"
-      - "data_cache/{client}/gsc_pages_raw_{p2_start}_{p2_end}.json"
-      - "data_cache/{client}/gsc_pages_norm_{p2_start}_{p2_end}.json"
-      - "data_cache/{client}/analysis_gsc_pages_{p1_slug}{p2_slug}.json"
-    checks_hypotheses:
-      - H2.1
-      - H5.1
-    checks_signals:
-      - S2
-      - S5
-    priority: 3
-    depends_on:
-      - C2.1
-    data_source: "google_search_console"
-    implementation_notes: |
-      - Dimensions: page
-      - Корреляция с C2.1 (Метрика показывает объём, GSC — почему)
-    
-  - id: C6.1
-    name: "Yandex Webmaster Queries Analysis"
-    description: "Анализ запросов Яндекс.Вебмастер: клики, показы, позиции"
-    status: planned_tier1
-    tier: 1
-    command_template: "python -m app.cli analyze-ym-webmaster-queries {client} {p1_start} {p1_end} {p2_start} {p2_end} --limit {limit}"
-    artifacts:
-      - "data_cache/{client}/ym_webmaster_queries_raw_{p1_start}_{p1_end}.json"
-      - "data_cache/{client}/ym_webmaster_queries_norm_{p1_start}_{p1_end}.json"
-      - "data_cache/{client}/ym_webmaster_queries_raw_{p2_start}_{p2_end}.json"
-      - "data_cache/{client}/ym_webmaster_queries_norm_{p2_start}_{p2_end}.json"
-      - "data_cache/{client}/analysis_ym_webmaster_queries_{p1_slug}{p2_slug}.json"
-    checks_hypotheses:
-      - H2.2
-      - H2.3
-      - H3.1
-      - H3.2
-      - S2
-      - S3
-    checks_signals:
-      - S2
-      - S3
-    priority: 3
-    depends_on:
-      - C2.1
-    data_source: "yandex_webmaster"
-    implementation_notes: |
-      - Требует OAuth (YM_WEBMASTER_TOKEN, YM_WEBMASTER_HOST_ID, YM_WEBMASTER_USER_ID)
-      - Endpoint: /search-queries/popular
-      - query_indicator: TOTAL_SHOWS, TOTAL_CLICKS, AVG_SHOW_POSITION
-      - Критично для российского рынка
-    
-  - id: C6.2
-    name: "Yandex Webmaster Indexing Analysis"
-    description: "Проверка индексации Яндекс: EXCLUDED URLs, причины исключения"
-    status: planned_tier1
-    tier: 1
-    command_template: "python -m app.cli ym-webmaster-indexing {client} --status EXCLUDED"
-    artifacts:
-      - "data_cache/{client}/ym_webmaster_indexing_excluded_{snapshot_date}.json"
-    checks_hypotheses:
-      - H2.5
-      - H5.2
-    checks_signals:
-      - S2
-      - S5
-    priority: 4
-    depends_on:
-      - C2.1
-    data_source: "yandex_webmaster"
-    implementation_notes: |
-      - Endpoint: /search-urls/samples?search_url_status=EXCLUDED
-      - Показывает причины: HTTP_404, DUPLICATE, NOINDEX, ROBOTS_TXT
-      - Единственный способ диагностировать индексацию
-    
-  # ============================================================
-  # TIER 2: Important (важно для полноты анализа)
-  # ============================================================
-  
-  - id: C2
-    name: "Landing Pages Overall"
-    description: "Анализ входных страниц по всему сайту (без сегментации по источникам)"
-    status: planned_tier2
-    tier: 2
-    command_template: "python -m app.cli analyze-pages {client} {p1_start} {p1_end} {p2_start} {p2_end} --limit {limit}"
-    artifacts:
-      - "data_cache/{client}/analysis_pages_{p1_slug}{p2_slug}.json"
-    checks_hypotheses:
-      - H1.2
-      - H5.3
-      - H8.3
-    checks_signals:
-      - S1
-      - S5
-      - S8
-    priority: 5
-    depends_on: []
-    data_source: "yandex_metrika"
-    
-  - id: C3
-    name: "Goals by Source"
-    description: "Анализ конверсий по целям в разрезе источников трафика"
-    status: planned_tier2
-    tier: 2
-    command_template: "python -m app.cli analyze-goals-by-source {client} {p1_start} {p1_end} {p2_start} {p2_end} --goal-id {goal_id} --limit {limit}"
-    artifacts:
-      - "data_cache/{client}/analysis_goals_by_source_{goal_id}_{p1_slug}{p2_slug}.json"
-    checks_hypotheses:
-      - H4.2
-      - H4.4
-    checks_signals:
-      - S4
-    priority: 6
-    depends_on:
-      - C1
-    data_source: "yandex_metrika"
-    implementation_notes: |
-      - Requires goal_id в clients/<client>/config.yaml
-      - Metrics: ym:s:visits, ym:s:goal<goal_id>visits, ym:s:goal<goal_id>conversionRate
-      - Dimensions: ym:s:lastTrafficSource
-    
-  - id: C3.1
-    name: "Goals by Page"
-    description: "Анализ конверсий по целям в разрезе входных страниц"
-    status: planned_tier2
-    tier: 2
-    command_template: "python -m app.cli analyze-goals-by-page {client} {p1_start} {p1_end} {p2_start} {p2_end} --goal-id {goal_id} --limit {limit}"
-    artifacts:
-      - "data_cache/{client}/analysis_goals_by_page_{goal_id}_{p1_slug}{p2_slug}.json"
-    checks_hypotheses:
-      - H5.3
-    checks_signals:
-      - S5
-    priority: 7
-    depends_on:
-      - C2
-    data_source: "yandex_metrika"
-    
-  - id: C5.3
-    name: "GSC Query × Page"
-    description: "Детализация: какие запросы приводят на какие страницы (Google)"
-    status: planned_tier2
-    tier: 2
-    command_template: "python -m app.cli gsc-query-page {client} {p1_start} {p1_end} {p2_start} {p2_end} --limit {limit}"
-    artifacts:
-      - "data_cache/{client}/gsc_query_page_raw_{p1_start}_{p1_end}.json"
-      - "data_cache/{client}/gsc_query_page_norm_{p1_start}_{p1_end}.json"
-    checks_hypotheses:
-      - H2.1
-      - H5.1
-    checks_signals:
-      - S2
-      - S5
-    priority: 8
-    depends_on:
-      - C5.1
-      - C5.2
-    data_source: "google_search_console"
-    implementation_notes: |
-      - Dimensions: query, page
-      - rowLimit: 5000 (больше данных)
-      - Очень детальная информация, используется для deep dive
-    
-  # ============================================================
-  # TIER 3: Extension (расширение)
-  # ============================================================
-  
-  - id: C4
-    name: "Ecommerce by Source"
-    description: "Анализ транзакций/дохода/AOV/CR по источникам"
-    status: planned_tier3
-    tier: 3
-    command_template: "python -m app.cli analyze-ecommerce-by-source {client} {p1_start} {p1_end} {p2_start} {p2_end} --goal-id {ecommerce_goal_id} --limit {limit}"
-    artifacts:
-      - "data_cache/{client}/analysis_ecommerce_by_source_{goal_id}_{p1_slug}{p2_slug}.json"
-    checks_hypotheses:
-      - H4.1
-    checks_signals:
-      - S4
-    priority: 9
-    depends_on:
-      - C1
-    data_source: "yandex_metrika"
-    implementation_notes: |
-      - Requires валидация доступности ecommerce метрик в счётчике
-      - Metrics: ym:s:ecommerce<goal_id>Revenue, ym:s:ecommerce<goal_id>Purchases
-      - Calculated: AOV = Revenue / Purchases
-    
-  - id: C7
-    name: "CRM Integration"
-    description: "Валидация трекинга: сопоставление заказов/дохода Метрика vs CRM"
-    status: planned_tier3
-    tier: 3
-    command_template: "python -m app.cli validate-crm {client} {p1_start} {p1_end} {p2_start} {p2_end}"
-    artifacts:
-      - "data_cache/{client}/crm_validation_{p1_slug}{p2_slug}.json"
-    checks_hypotheses:
-      - H4.3
-    checks_signals:
-      - S4
-    priority: 10
-    depends_on:
-      - C4
-    data_source: "crm"
-    implementation_notes: |
-      - Требует интеграцию с CRM/платёжкой
-      - Ground truth для ecommerce
-    
-  # ============================================================
-  # TIER 3: Advanced dimensions
-  # ============================================================
-  
-  - id: C_DEVICE
-    name: "Analysis by Device"
-    description: "Анализ по устройствам (mobile/desktop/tablet)"
-    status: planned_tier3
-    tier: 3
-    command_template: "python -m app.cli analyze-by-device {client} {p1_start} {p1_end} {p2_start} {p2_end}"
-    artifacts:
-      - "data_cache/{client}/analysis_by_device_{p1_slug}{p2_slug}.json"
-    checks_hypotheses:
-      - H8.1
-    checks_signals:
-      - S8
-    priority: 11
-    depends_on:
-      - C1
-    data_source: "yandex_metrika"
-    
-  - id: C_GEO
-    name: "Analysis by Geo"
-    description: "Анализ по географии (страны/города)"
-    status: planned_tier3
-    tier: 3
-    command_template: "python -m app.cli analyze-by-geo {client} {p1_start} {p1_end} {p2_start} {p2_end}"
-    artifacts:
-      - "data_cache/{client}/analysis_by_geo_{p1_slug}{p2_slug}.json"
-    checks_hypotheses: []
-    checks_signals: []
-    priority: 12
-    depends_on:
-      - C1
-    data_source: "yandex_metrika"
-
-# ============================================================
-# Signals to Primary Hypotheses Mapping
-# ============================================================
-
+- id: C1
+  name: Sources Period Compare
+  description: "\u0421\u0440\u0430\u0432\u043D\u0435\u043D\u0438\u0435 \u0438\u0441\
+    \u0442\u043E\u0447\u043D\u0438\u043A\u043E\u0432 \u0442\u0440\u0430\u0444\u0438\
+    \u043A\u0430 \u043C\u0435\u0436\u0434\u0443 \u0434\u0432\u0443\u043C\u044F \u043F\
+    \u0435\u0440\u0438\u043E\u0434\u0430\u043C\u0438"
+  status: implemented
+  tier: 0
+  command_template: python -m app.cli metrika-sources {client} {p1_start} {p1_end}
+    {p2_start} {p2_end} --limit {limit}
+  artifacts:
+  - data_cache/{client}/metrika_sources_raw_{p1_start}_{p1_end}.json
+  - data_cache/{client}/metrika_sources_norm_{p1_start}_{p1_end}.json
+  - data_cache/{client}/metrika_sources_raw_{p2_start}_{p2_end}.json
+  - data_cache/{client}/metrika_sources_norm_{p2_start}_{p2_end}.json
+  - data_cache/{client}/analysis_sources_{p1_slug}{p2_slug}.json
+  checks_hypotheses:
+  - H1.1
+  - H1.2
+  - H1.3
+  - H1.4
+  - H1.5
+  - H1.6
+  - S1
+  - S2
+  checks_signals:
+  - S1
+  - S2
+  priority: 1
+  depends_on: []
+  data_source: yandex_metrika
+- id: C2.1
+  name: Landing Pages by Source
+  description: "\u0410\u043D\u0430\u043B\u0438\u0437 \u0432\u0445\u043E\u0434\u043D\
+    \u044B\u0445 \u0441\u0442\u0440\u0430\u043D\u0438\u0446 \u0432 \u0441\u0435\u0433\
+    \u043C\u0435\u043D\u0442\u0435 \u043A\u043E\u043D\u043A\u0440\u0435\u0442\u043D\
+    \u043E\u0433\u043E \u0438\u0441\u0442\u043E\u0447\u043D\u0438\u043A\u0430 (\u043D\
+    \u0430\u043F\u0440., \u0442\u043E\u043B\u044C\u043A\u043E \u043E\u0440\u0433\u0430\
+    \u043D\u0438\u043A\u0430)"
+  status: planned_tier1
+  tier: 1
+  command_template: python -m app.cli metrika-pages-by-source {client} {p1_start}
+    {p1_end} {p2_start} {p2_end} --limit {limit}
+  artifacts:
+  - data_cache/{client}/metrika_pages_by_source_raw_{source_slug}_{p1_start}_{p1_end}.json
+  - data_cache/{client}/metrika_pages_by_source_norm_{source_slug}_{p1_start}_{p1_end}.json
+  - data_cache/{client}/metrika_pages_by_source_raw_{source_slug}_{p2_start}_{p2_end}.json
+  - data_cache/{client}/metrika_pages_by_source_norm_{source_slug}_{p2_start}_{p2_end}.json
+  - data_cache/{client}/analysis_pages_by_source_{source_slug}_{p1_slug}{p2_slug}.json
+  checks_hypotheses:
+  - H2.1
+  - H5.1
+  - S2
+  - S5
+  checks_signals:
+  - S2
+  - S5
+  priority: 2
+  depends_on:
+  - C1
+  data_source: yandex_metrika
+  implementation_notes: "- \u0418\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\
+    \u0442\u044C filters=ym:s:lastTrafficSource=='{source}'\n- source_slug: slugify(source)\
+    \ \u0434\u043B\u044F \u0438\u043C\u0435\u043D\u0438 \u0444\u0430\u0439\u043B\u0430\
+    \n- \u0410\u043D\u0430\u043B\u043E\u0433\u0438\u0447\u043D\u043E analyze-sources,\
+    \ \u043D\u043E \u0441 \u0444\u0438\u043B\u044C\u0442\u0440\u043E\u043C\n"
+- id: C5.1
+  name: GSC Queries Analysis
+  description: "\u0410\u043D\u0430\u043B\u0438\u0437 \u0437\u0430\u043F\u0440\u043E\
+    \u0441\u043E\u0432 Google Search Console: \u043A\u043B\u0438\u043A\u0438, \u043F\
+    \u043E\u043A\u0430\u0437\u044B, CTR, \u043F\u043E\u0437\u0438\u0446\u0438\u0438"
+  status: planned_tier1
+  tier: 1
+  command_template: python -m app.cli gsc-queries {client} {p1_start} {p1_end} {p2_start}
+    {p2_end} --limit {limit}
+  artifacts:
+  - data_cache/{client}/gsc_queries_raw_{p1_start}_{p1_end}.json
+  - data_cache/{client}/gsc_queries_norm_{p1_start}_{p1_end}.json
+  - data_cache/{client}/gsc_queries_raw_{p2_start}_{p2_end}.json
+  - data_cache/{client}/gsc_queries_norm_{p2_start}_{p2_end}.json
+  - data_cache/{client}/analysis_gsc_queries_{p1_slug}{p2_slug}.json
+  checks_hypotheses:
+  - H2.2
+  - H2.3
+  - H2.4
+  - H3.1
+  - H3.2
+  - S2
+  - S3
+  checks_signals:
+  - S2
+  - S3
+  priority: 3
+  depends_on:
+  - C2.1
+  data_source: google_search_console
+  implementation_notes: "- \u0422\u0440\u0435\u0431\u0443\u0435\u0442 OAuth 2.0 (GSC_CLIENT_ID,\
+    \ GSC_CLIENT_SECRET, GSC_REFRESH_TOKEN)\n- Dimensions: query\n- Metrics: clicks,\
+    \ impressions, ctr, position\n- rowLimit: 1000 \u043F\u043E \u0443\u043C\u043E\
+    \u043B\u0447\u0430\u043D\u0438\u044E\n"
+- id: C5.2
+  name: GSC Pages Analysis
+  description: "\u0410\u043D\u0430\u043B\u0438\u0437 \u0441\u0442\u0440\u0430\u043D\
+    \u0438\u0446 Google Search Console: \u043A\u043B\u0438\u043A\u0438, \u043F\u043E\
+    \u043A\u0430\u0437\u044B, CTR, \u043F\u043E\u0437\u0438\u0446\u0438\u0438"
+  status: planned_tier1
+  tier: 1
+  command_template: python -m app.cli gsc-pages {client} {p1_start} {p1_end} {p2_start}
+    {p2_end} --limit {limit}
+  artifacts:
+  - data_cache/{client}/gsc_pages_raw_{p1_start}_{p1_end}.json
+  - data_cache/{client}/gsc_pages_norm_{p1_start}_{p1_end}.json
+  - data_cache/{client}/gsc_pages_raw_{p2_start}_{p2_end}.json
+  - data_cache/{client}/gsc_pages_norm_{p2_start}_{p2_end}.json
+  - data_cache/{client}/analysis_gsc_pages_{p1_slug}{p2_slug}.json
+  checks_hypotheses:
+  - H2.1
+  - H5.1
+  checks_signals:
+  - S2
+  - S5
+  priority: 3
+  depends_on:
+  - C2.1
+  data_source: google_search_console
+  implementation_notes: "- Dimensions: page\n- \u041A\u043E\u0440\u0440\u0435\u043B\
+    \u044F\u0446\u0438\u044F \u0441 C2.1 (\u041C\u0435\u0442\u0440\u0438\u043A\u0430\
+    \ \u043F\u043E\u043A\u0430\u0437\u044B\u0432\u0430\u0435\u0442 \u043E\u0431\u044A\
+    \u0451\u043C, GSC \u2014 \u043F\u043E\u0447\u0435\u043C\u0443)\n"
+- id: C6.1
+  name: Yandex Webmaster Queries Analysis
+  description: "\u0410\u043D\u0430\u043B\u0438\u0437 \u0437\u0430\u043F\u0440\u043E\
+    \u0441\u043E\u0432 \u042F\u043D\u0434\u0435\u043A\u0441.\u0412\u0435\u0431\u043C\
+    \u0430\u0441\u0442\u0435\u0440: \u043A\u043B\u0438\u043A\u0438, \u043F\u043E\u043A\
+    \u0430\u0437\u044B, \u043F\u043E\u0437\u0438\u0446\u0438\u0438"
+  status: planned_tier1
+  tier: 1
+  command_template: python -m app.cli ym-webmaster-queries {client} {p1_start} {p1_end}
+    {p2_start} {p2_end} --limit {limit}
+  artifacts:
+  - data_cache/{client}/ym_webmaster_queries_raw_{p1_start}_{p1_end}.json
+  - data_cache/{client}/ym_webmaster_queries_norm_{p1_start}_{p1_end}.json
+  - data_cache/{client}/ym_webmaster_queries_raw_{p2_start}_{p2_end}.json
+  - data_cache/{client}/ym_webmaster_queries_norm_{p2_start}_{p2_end}.json
+  - data_cache/{client}/analysis_ym_webmaster_queries_{p1_slug}{p2_slug}.json
+  checks_hypotheses:
+  - H2.2
+  - H2.3
+  - H3.1
+  - H3.2
+  - S2
+  - S3
+  checks_signals:
+  - S2
+  - S3
+  priority: 3
+  depends_on:
+  - C2.1
+  data_source: yandex_webmaster
+  implementation_notes: "- \u0422\u0440\u0435\u0431\u0443\u0435\u0442 OAuth (YM_WEBMASTER_TOKEN,\
+    \ YM_WEBMASTER_HOST_ID, YM_WEBMASTER_USER_ID)\n- Endpoint: /search-queries/popular\n\
+    - query_indicator: TOTAL_SHOWS, TOTAL_CLICKS, AVG_SHOW_POSITION\n- \u041A\u0440\
+    \u0438\u0442\u0438\u0447\u043D\u043E \u0434\u043B\u044F \u0440\u043E\u0441\u0441\
+    \u0438\u0439\u0441\u043A\u043E\u0433\u043E \u0440\u044B\u043D\u043A\u0430\n"
+- id: C6.2
+  name: Yandex Webmaster Indexing Analysis
+  description: "\u041F\u0440\u043E\u0432\u0435\u0440\u043A\u0430 \u0438\u043D\u0434\
+    \u0435\u043A\u0441\u0430\u0446\u0438\u0438 \u042F\u043D\u0434\u0435\u043A\u0441\
+    : EXCLUDED URLs, \u043F\u0440\u0438\u0447\u0438\u043D\u044B \u0438\u0441\u043A\
+    \u043B\u044E\u0447\u0435\u043D\u0438\u044F"
+  status: planned_tier2
+  tier: 1
+  command_template: TBD (verify actual CLI command name for this capability)
+  artifacts:
+  - data_cache/{client}/ym_webmaster_indexing_excluded_{snapshot_date}.json
+  checks_hypotheses:
+  - H2.5
+  - H5.2
+  checks_signals:
+  - S2
+  - S5
+  priority: 4
+  depends_on:
+  - C2.1
+  data_source: yandex_webmaster
+  implementation_notes: "- Endpoint: /search-urls/samples?search_url_status=EXCLUDED\n\
+    - \u041F\u043E\u043A\u0430\u0437\u044B\u0432\u0430\u0435\u0442 \u043F\u0440\u0438\
+    \u0447\u0438\u043D\u044B: HTTP_404, DUPLICATE, NOINDEX, ROBOTS_TXT\n- \u0415\u0434\
+    \u0438\u043D\u0441\u0442\u0432\u0435\u043D\u043D\u044B\u0439 \u0441\u043F\u043E\
+    \u0441\u043E\u0431 \u0434\u0438\u0430\u0433\u043D\u043E\u0441\u0442\u0438\u0440\
+    \u043E\u0432\u0430\u0442\u044C \u0438\u043D\u0434\u0435\u043A\u0441\u0430\u0446\
+    \u0438\u044E\n"
+- id: C2
+  name: Landing Pages Overall
+  description: "\u0410\u043D\u0430\u043B\u0438\u0437 \u0432\u0445\u043E\u0434\u043D\
+    \u044B\u0445 \u0441\u0442\u0440\u0430\u043D\u0438\u0446 \u043F\u043E \u0432\u0441\
+    \u0435\u043C\u0443 \u0441\u0430\u0439\u0442\u0443 (\u0431\u0435\u0437 \u0441\u0435\
+    \u0433\u043C\u0435\u043D\u0442\u0430\u0446\u0438\u0438 \u043F\u043E \u0438\u0441\
+    \u0442\u043E\u0447\u043D\u0438\u043A\u0430\u043C)"
+  status: planned_tier2
+  tier: 2
+  command_template: python -m app.cli metrika-pages {client} {p1_start} {p1_end} {p2_start}
+    {p2_end} --limit {limit}
+  artifacts:
+  - data_cache/{client}/analysis_pages_{p1_slug}{p2_slug}.json
+  checks_hypotheses:
+  - H1.2
+  - H5.3
+  - H8.3
+  checks_signals:
+  - S1
+  - S5
+  - S8
+  priority: 5
+  depends_on: []
+  data_source: yandex_metrika
+- id: C3
+  name: Goals by Source
+  description: "\u0410\u043D\u0430\u043B\u0438\u0437 \u043A\u043E\u043D\u0432\u0435\
+    \u0440\u0441\u0438\u0439 \u043F\u043E \u0446\u0435\u043B\u044F\u043C \u0432 \u0440\
+    \u0430\u0437\u0440\u0435\u0437\u0435 \u0438\u0441\u0442\u043E\u0447\u043D\u0438\
+    \u043A\u043E\u0432 \u0442\u0440\u0430\u0444\u0438\u043A\u0430"
+  status: planned_tier2
+  tier: 2
+  command_template: python -m app.cli metrika-goals-by-source {client} {p1_start}
+    {p1_end} {p2_start} {p2_end} --limit {limit}
+  artifacts:
+  - data_cache/{client}/analysis_goals_by_source_{goal_id}_{p1_slug}{p2_slug}.json
+  checks_hypotheses:
+  - H4.2
+  - H4.4
+  checks_signals:
+  - S4
+  priority: 6
+  depends_on:
+  - C1
+  data_source: yandex_metrika
+  implementation_notes: "- Requires goal_id \u0432 clients/<client>/config.yaml\n\
+    - Metrics: ym:s:visits, ym:s:goal<goal_id>visits, ym:s:goal<goal_id>conversionRate\n\
+    - Dimensions: ym:s:lastTrafficSource\n"
+- id: C3.1
+  name: Goals by Page
+  description: "\u0410\u043D\u0430\u043B\u0438\u0437 \u043A\u043E\u043D\u0432\u0435\
+    \u0440\u0441\u0438\u0439 \u043F\u043E \u0446\u0435\u043B\u044F\u043C \u0432 \u0440\
+    \u0430\u0437\u0440\u0435\u0437\u0435 \u0432\u0445\u043E\u0434\u043D\u044B\u0445\
+    \ \u0441\u0442\u0440\u0430\u043D\u0438\u0446"
+  status: planned_tier2
+  tier: 2
+  command_template: python -m app.cli metrika-goals-by-page {client} {p1_start} {p1_end}
+    {p2_start} {p2_end} --limit {limit}
+  artifacts:
+  - data_cache/{client}/analysis_goals_by_page_{goal_id}_{p1_slug}{p2_slug}.json
+  checks_hypotheses:
+  - H5.3
+  checks_signals:
+  - S5
+  priority: 7
+  depends_on:
+  - C2
+  data_source: yandex_metrika
+- id: C5.3
+  name: "GSC Query \xD7 Page"
+  description: "\u0414\u0435\u0442\u0430\u043B\u0438\u0437\u0430\u0446\u0438\u044F\
+    : \u043A\u0430\u043A\u0438\u0435 \u0437\u0430\u043F\u0440\u043E\u0441\u044B \u043F\
+    \u0440\u0438\u0432\u043E\u0434\u044F\u0442 \u043D\u0430 \u043A\u0430\u043A\u0438\
+    \u0435 \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u044B (Google)"
+  status: planned_tier2
+  tier: 2
+  command_template: TBD (planned capability; no CLI command yet)
+  artifacts:
+  - data_cache/{client}/gsc_query_page_raw_{p1_start}_{p1_end}.json
+  - data_cache/{client}/gsc_query_page_norm_{p1_start}_{p1_end}.json
+  checks_hypotheses:
+  - H2.1
+  - H5.1
+  checks_signals:
+  - S2
+  - S5
+  priority: 8
+  depends_on:
+  - C5.1
+  - C5.2
+  data_source: google_search_console
+  implementation_notes: "- Dimensions: query, page\n- rowLimit: 5000 (\u0431\u043E\
+    \u043B\u044C\u0448\u0435 \u0434\u0430\u043D\u043D\u044B\u0445)\n- \u041E\u0447\
+    \u0435\u043D\u044C \u0434\u0435\u0442\u0430\u043B\u044C\u043D\u0430\u044F \u0438\
+    \u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044F, \u0438\u0441\u043F\u043E\
+    \u043B\u044C\u0437\u0443\u0435\u0442\u0441\u044F \u0434\u043B\u044F deep dive\n"
+- id: C4
+  name: Ecommerce by Source
+  description: "\u0410\u043D\u0430\u043B\u0438\u0437 \u0442\u0440\u0430\u043D\u0437\
+    \u0430\u043A\u0446\u0438\u0439/\u0434\u043E\u0445\u043E\u0434\u0430/AOV/CR \u043F\
+    \u043E \u0438\u0441\u0442\u043E\u0447\u043D\u0438\u043A\u0430\u043C"
+  status: planned_tier3
+  tier: 3
+  command_template: TBD (planned capability; no CLI command yet)
+  artifacts:
+  - data_cache/{client}/analysis_ecommerce_by_source_{goal_id}_{p1_slug}{p2_slug}.json
+  checks_hypotheses:
+  - H4.1
+  checks_signals:
+  - S4
+  priority: 9
+  depends_on:
+  - C1
+  data_source: yandex_metrika
+  implementation_notes: "- Requires \u0432\u0430\u043B\u0438\u0434\u0430\u0446\u0438\
+    \u044F \u0434\u043E\u0441\u0442\u0443\u043F\u043D\u043E\u0441\u0442\u0438 ecommerce\
+    \ \u043C\u0435\u0442\u0440\u0438\u043A \u0432 \u0441\u0447\u0451\u0442\u0447\u0438\
+    \u043A\u0435\n- Metrics: ym:s:ecommerce<goal_id>Revenue, ym:s:ecommerce<goal_id>Purchases\n\
+    - Calculated: AOV = Revenue / Purchases\n"
+- id: C7
+  name: CRM Integration
+  description: "\u0412\u0430\u043B\u0438\u0434\u0430\u0446\u0438\u044F \u0442\u0440\
+    \u0435\u043A\u0438\u043D\u0433\u0430: \u0441\u043E\u043F\u043E\u0441\u0442\u0430\
+    \u0432\u043B\u0435\u043D\u0438\u0435 \u0437\u0430\u043A\u0430\u0437\u043E\u0432\
+    /\u0434\u043E\u0445\u043E\u0434\u0430 \u041C\u0435\u0442\u0440\u0438\u043A\u0430\
+    \ vs CRM"
+  status: planned_tier3
+  tier: 3
+  command_template: TBD (planned capability; no CLI command yet)
+  artifacts:
+  - data_cache/{client}/crm_validation_{p1_slug}{p2_slug}.json
+  checks_hypotheses:
+  - H4.3
+  checks_signals:
+  - S4
+  priority: 10
+  depends_on:
+  - C4
+  data_source: crm
+  implementation_notes: "- \u0422\u0440\u0435\u0431\u0443\u0435\u0442 \u0438\u043D\
+    \u0442\u0435\u0433\u0440\u0430\u0446\u0438\u044E \u0441 CRM/\u043F\u043B\u0430\
+    \u0442\u0451\u0436\u043A\u043E\u0439\n- Ground truth \u0434\u043B\u044F ecommerce\n"
+- id: C_DEVICE
+  name: Analysis by Device
+  description: "\u0410\u043D\u0430\u043B\u0438\u0437 \u043F\u043E \u0443\u0441\u0442\
+    \u0440\u043E\u0439\u0441\u0442\u0432\u0430\u043C (mobile/desktop/tablet)"
+  status: planned_tier3
+  tier: 3
+  command_template: TBD (planned capability; no CLI command yet)
+  artifacts:
+  - data_cache/{client}/analysis_by_device_{p1_slug}{p2_slug}.json
+  checks_hypotheses:
+  - H8.1
+  checks_signals:
+  - S8
+  priority: 11
+  depends_on:
+  - C1
+  data_source: yandex_metrika
+- id: C_GEO
+  name: Analysis by Geo
+  description: "\u0410\u043D\u0430\u043B\u0438\u0437 \u043F\u043E \u0433\u0435\u043E\
+    \u0433\u0440\u0430\u0444\u0438\u0438 (\u0441\u0442\u0440\u0430\u043D\u044B/\u0433\
+    \u043E\u0440\u043E\u0434\u0430)"
+  status: planned_tier3
+  tier: 3
+  command_template: TBD (planned capability; no CLI command yet)
+  artifacts:
+  - data_cache/{client}/analysis_by_geo_{p1_slug}{p2_slug}.json
+  checks_hypotheses: []
+  checks_signals: []
+  priority: 12
+  depends_on:
+  - C1
+  data_source: yandex_metrika
 signal_to_hypotheses:
-  S1:  # Общий трафик упал
+  S1:
     primary:
-      - H1.1
-      - H1.2
+    - H1.1
+    - H1.2
     secondary:
-      - H1.3
-      - H1.4
-  
-  S2:  # Органика упала
+    - H1.3
+    - H1.4
+  S2:
     primary:
-      - H2.1
-      - H2.3
+    - H2.1
+    - H2.3
     secondary:
-      - H2.2
-      - H2.4
-      - H2.5
-  
-  S3:  # Яндекс vs Google
+    - H2.2
+    - H2.4
+    - H2.5
+  S3:
     primary:
-      - H3.1
+    - H3.1
     secondary:
-      - H3.2
-      - H3.3
-  
-  S4:  # Конверсия упала
+    - H3.2
+    - H3.3
+  S4:
     primary:
-      - H4.1
-      - H4.2
+    - H4.1
+    - H4.2
     secondary:
-      - H4.3
-      - H4.4
-  
-  S5:  # Падение в нескольких страницах
+    - H4.3
+    - H4.4
+  S5:
     primary:
-      - H5.1
+    - H5.1
     secondary:
-      - H5.2
-      - H5.3
-  
-  S6:  # Link traffic упал
+    - H5.2
+    - H5.3
+  S6:
     primary:
-      - H6.1
+    - H6.1
     secondary:
-      - H6.2
-  
-  S7:  # Direct аномалия
+    - H6.2
+  S7:
     primary:
-      - H7.1
+    - H7.1
     secondary:
-      - H7.2
-  
-  S8:  # Отказы выросли
+    - H7.2
+  S8:
     primary:
-      - H8.1
+    - H8.1
     secondary:
-      - H8.2
-      - H8.3
-
-# ============================================================
-# Configuration defaults
-# ============================================================
-
+    - H8.2
+    - H8.3
 defaults:
   limit: 50
   refresh: false
-  accuracy: "full"
+  accuracy: full
   use_cache: true
-
