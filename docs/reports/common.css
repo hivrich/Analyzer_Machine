@@ -659,3 +659,279 @@ section {
     }
 }
 
+/* =========================================================
+   Analyzer Machine — Visual Refresh (Unified Theme)
+   Версия: 1.1
+   Добавлять в КОНЕЦ common.css (переопределения поверх базы)
+   ========================================================= */
+
+/* 1) Design tokens (единая палитра + поверхности + эффекты) */
+:root {
+  /* Brand / Accent */
+  --am-accent: #2D5BFF;
+  --am-accent-2: #7C3AED;
+  --am-accent-rgb: 45, 91, 255;
+  --am-accent-2-rgb: 124, 58, 237;
+
+  /* Neutrals */
+  --am-ink: #0B1220;
+  --am-text: #111827;
+  --am-text-2: #1F2937;
+  --am-muted: #5B667A;
+  --am-border: #E4E7EE;
+
+  /* Surfaces */
+  --am-bg: #F6F7FB;
+  --am-surface: #FFFFFF;
+  --am-surface-2: #F2F4F8;
+
+  /* Shape / Shadow */
+  --am-radius: 14px;
+  --am-radius-sm: 10px;
+  --am-shadow: 0 10px 35px rgba(11, 18, 32, 0.10);
+  --am-shadow-soft: 0 6px 22px rgba(11, 18, 32, 0.08);
+
+  /* Typography */
+  --am-leading: 1.65;
+  --am-tracking-tight: -0.02em;
+}
+
+/* 2) Background + base typography refinement */
+body {
+  color: var(--am-text);
+  line-height: var(--am-leading);
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  background:
+    radial-gradient(900px 420px at 12% -10%, rgba(var(--am-accent-rgb), 0.10), transparent 60%),
+    radial-gradient(900px 420px at 88% -10%, rgba(var(--am-accent-2-rgb), 0.08), transparent 60%),
+    var(--am-bg);
+}
+
+/* 3) Container looks more "product-like" */
+.container {
+  background: var(--am-surface);
+  border-radius: var(--am-radius);
+  box-shadow: var(--am-shadow);
+  border: 1px solid rgba(228, 231, 238, 0.70);
+  padding: 44px;
+}
+
+/* 4) Header: чуть больше “воздуха” и редакционности */
+header {
+  padding-bottom: 16px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--am-border);
+}
+
+h1 {
+  font-size: 2.05em;
+  font-weight: 750;
+  letter-spacing: var(--am-tracking-tight);
+  line-height: 1.15;
+  margin-bottom: 10px;
+  color: var(--am-ink);
+}
+
+.subtitle {
+  color: var(--am-muted);
+  font-size: 1.05em;
+  margin-bottom: 16px;
+}
+
+.meta {
+  color: var(--am-muted);
+  font-size: 0.9em;
+}
+
+.meta strong,
+.meta b {
+  color: var(--am-text);
+}
+
+/* 5) Sticky nav: более аккуратная, менее “серый блок” */
+.nav {
+  border-radius: var(--am-radius-sm);
+  border: 1px solid var(--am-border);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: var(--am-shadow-soft);
+  backdrop-filter: blur(10px);
+}
+
+.nav a {
+  border-radius: 999px;
+  padding: 7px 12px;
+  border: 1px solid transparent;
+}
+
+.nav a:hover {
+  background: rgba(var(--am-accent-rgb), 0.10);
+  border-color: rgba(var(--am-accent-rgb), 0.22);
+}
+
+/* 6) Headings: тонкая линия + короткий акцент вместо “толстой полосы” */
+h2 {
+  font-size: 1.55em;
+  margin-top: 54px;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+
+  color: var(--am-ink);
+  border-bottom: 1px solid var(--am-border);
+  letter-spacing: var(--am-tracking-tight);
+  position: relative;
+
+  /* чтобы якоря не уезжали под sticky nav */
+  scroll-margin-top: 90px;
+}
+
+h2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 62px;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--am-accent), var(--am-accent-2));
+}
+
+h3 {
+  font-size: 1.18em;
+  margin-top: 26px;
+  margin-bottom: 10px;
+  color: var(--am-text);
+  letter-spacing: -0.01em;
+  scroll-margin-top: 90px;
+}
+
+/* 7) Executive Summary: “hero card”, а не шаблонный градиент */
+.executive-summary {
+  background: var(--am-surface);
+  color: var(--am-text);
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius);
+  padding: 26px;
+  margin: 28px 0;
+  box-shadow: var(--am-shadow-soft);
+  position: relative;
+  overflow: hidden;
+}
+
+.executive-summary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(700px 260px at 0% 0%, rgba(var(--am-accent-rgb), 0.14), transparent 60%),
+    radial-gradient(700px 260px at 100% 0%, rgba(var(--am-accent-2-rgb), 0.12), transparent 60%);
+  pointer-events: none;
+}
+
+.executive-summary > * {
+  position: relative;
+}
+
+.executive-summary h2 {
+  color: var(--am-ink);
+  border: none;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 1.25em;
+}
+
+.executive-summary h2::after {
+  display: none;
+}
+
+.executive-summary p {
+  color: var(--am-text-2);
+}
+
+/* 8) Cards: один стиль “карточки” для всего */
+.metric-card,
+.highlight-box,
+.alert-box {
+  border-radius: var(--am-radius-sm);
+  border: 1px solid var(--am-border);
+  background: var(--am-surface);
+}
+
+.metric-card {
+  padding: 22px;
+  box-shadow: 0 1px 0 rgba(11, 18, 32, 0.04);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(11, 18, 32, 0.10);
+}
+
+/* 9) Paragraph “measure”: длинные абзацы читаются заметно лучше */
+.content p,
+.content ul,
+.content ol {
+  max-width: 82ch;
+}
+
+/* 10) Tables: зебра + hover, чуть мягче */
+table {
+  border-radius: var(--am-radius-sm);
+  border: 1px solid var(--am-border);
+}
+
+th {
+  background: var(--am-surface-2);
+  color: var(--am-ink);
+}
+
+tbody tr:nth-child(even) td {
+  background: rgba(242, 244, 248, 0.55);
+}
+
+tbody tr:hover td {
+  background: rgba(var(--am-accent-rgb), 0.06);
+}
+
+/* 11) Alerts / priorities: привести к одной логике и палитре */
+.alert-danger {
+  background: rgba(185, 28, 28, 0.10);
+  border-left-color: #B91C1C;
+  color: #7F1D1D;
+}
+
+.alert-warning {
+  background: rgba(180, 83, 9, 0.12);
+  border-left-color: #B45309;
+  color: #7C2D12;
+}
+
+.alert-info {
+  background: rgba(var(--am-accent-rgb), 0.10);
+  border-left-color: var(--am-accent);
+  color: #1E3A8A;
+}
+
+.alert-success {
+  background: rgba(14, 124, 102, 0.12);
+  border-left-color: #0E7C66;
+  color: #064E3B;
+}
+
+.priority-critical {
+  background: #B91C1C;
+  color: white;
+}
+
+.priority-high {
+  background: rgba(180, 83, 9, 0.14);
+  color: #7C2D12;
+}
+
+.priority-medium {
+  background: rgba(v
+
