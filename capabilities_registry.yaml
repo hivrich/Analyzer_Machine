@@ -9,7 +9,7 @@ capabilities:
     \u0435\u0440\u0438\u043E\u0434\u0430\u043C\u0438"
   status: implemented
   tier: 0
-  command_template: python -m app.cli metrika-sources {client} {p1_start} {p1_end}
+  command_template: python -m app.cli analyze-sources {client} {p1_start} {p1_end}
     {p2_start} {p2_end} --limit {limit}
   artifacts:
   - data_cache/{client}/metrika_sources_raw_{p1_start}_{p1_end}.json
@@ -42,8 +42,7 @@ capabilities:
     \u043D\u0438\u043A\u0430)"
   status: planned_tier1
   tier: 1
-  command_template: python -m app.cli metrika-pages-by-source {client} {p1_start}
-    {p1_end} {p2_start} {p2_end} --limit {limit}
+  command_template: TBD (planned; no CLI command yet)
   artifacts:
   - data_cache/{client}/metrika_pages_by_source_raw_{source_slug}_{p1_start}_{p1_end}.json
   - data_cache/{client}/metrika_pages_by_source_norm_{source_slug}_{p1_start}_{p1_end}.json
@@ -74,8 +73,7 @@ capabilities:
     \u043E\u043A\u0430\u0437\u044B, CTR, \u043F\u043E\u0437\u0438\u0446\u0438\u0438"
   status: planned_tier1
   tier: 1
-  command_template: python -m app.cli gsc-queries {client} {p1_start} {p1_end} {p2_start}
-    {p2_end} --limit {limit}
+  command_template: TBD (planned; no CLI command yet)
   artifacts:
   - data_cache/{client}/gsc_queries_raw_{p1_start}_{p1_end}.json
   - data_cache/{client}/gsc_queries_norm_{p1_start}_{p1_end}.json
@@ -108,8 +106,7 @@ capabilities:
     \u043A\u0430\u0437\u044B, CTR, \u043F\u043E\u0437\u0438\u0446\u0438\u0438"
   status: planned_tier1
   tier: 1
-  command_template: python -m app.cli gsc-pages {client} {p1_start} {p1_end} {p2_start}
-    {p2_end} --limit {limit}
+  command_template: TBD (planned; no CLI command yet)
   artifacts:
   - data_cache/{client}/gsc_pages_raw_{p1_start}_{p1_end}.json
   - data_cache/{client}/gsc_pages_norm_{p1_start}_{p1_end}.json
@@ -138,8 +135,7 @@ capabilities:
     \u0430\u0437\u044B, \u043F\u043E\u0437\u0438\u0446\u0438\u0438"
   status: planned_tier1
   tier: 1
-  command_template: python -m app.cli ym-webmaster-queries {client} {p1_start} {p1_end}
-    {p2_start} {p2_end} --limit {limit}
+  command_template: TBD (planned; no CLI command yet)
   artifacts:
   - data_cache/{client}/ym_webmaster_queries_raw_{p1_start}_{p1_end}.json
   - data_cache/{client}/ym_webmaster_queries_norm_{p1_start}_{p1_end}.json
@@ -173,7 +169,7 @@ capabilities:
     \u043B\u044E\u0447\u0435\u043D\u0438\u044F"
   status: planned_tier2
   tier: 1
-  command_template: TBD (verify actual CLI command name for this capability)
+  command_template: TBD (planned; no CLI command yet)
   artifacts:
   - data_cache/{client}/ym_webmaster_indexing_excluded_{snapshot_date}.json
   checks_hypotheses:
@@ -202,8 +198,7 @@ capabilities:
     \u0442\u043E\u0447\u043D\u0438\u043A\u0430\u043C)"
   status: planned_tier2
   tier: 2
-  command_template: python -m app.cli metrika-pages {client} {p1_start} {p1_end} {p2_start}
-    {p2_end} --limit {limit}
+  command_template: TBD (planned; no CLI command yet)
   artifacts:
   - data_cache/{client}/analysis_pages_{p1_slug}{p2_slug}.json
   checks_hypotheses:
@@ -225,8 +220,7 @@ capabilities:
     \u043A\u043E\u0432 \u0442\u0440\u0430\u0444\u0438\u043A\u0430"
   status: planned_tier2
   tier: 2
-  command_template: python -m app.cli metrika-goals-by-source {client} {p1_start}
-    {p1_end} {p2_start} {p2_end} --limit {limit}
+  command_template: TBD (planned; no CLI command yet)
   artifacts:
   - data_cache/{client}/analysis_goals_by_source_{goal_id}_{p1_slug}{p2_slug}.json
   checks_hypotheses:
@@ -249,8 +243,7 @@ capabilities:
     \ \u0441\u0442\u0440\u0430\u043D\u0438\u0446"
   status: planned_tier2
   tier: 2
-  command_template: python -m app.cli metrika-goals-by-page {client} {p1_start} {p1_end}
-    {p2_start} {p2_end} --limit {limit}
+  command_template: TBD (planned; no CLI command yet)
   artifacts:
   - data_cache/{client}/analysis_goals_by_page_{goal_id}_{p1_slug}{p2_slug}.json
   checks_hypotheses:
@@ -269,7 +262,7 @@ capabilities:
     \u0435 \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u044B (Google)"
   status: planned_tier2
   tier: 2
-  command_template: TBD (planned capability; no CLI command yet)
+  command_template: TBD (planned; no CLI command yet)
   artifacts:
   - data_cache/{client}/gsc_query_page_raw_{p1_start}_{p1_end}.json
   - data_cache/{client}/gsc_query_page_norm_{p1_start}_{p1_end}.json
@@ -296,7 +289,7 @@ capabilities:
     \u043E \u0438\u0441\u0442\u043E\u0447\u043D\u0438\u043A\u0430\u043C"
   status: planned_tier3
   tier: 3
-  command_template: TBD (planned capability; no CLI command yet)
+  command_template: TBD (planned; no CLI command yet)
   artifacts:
   - data_cache/{client}/analysis_ecommerce_by_source_{goal_id}_{p1_slug}{p2_slug}.json
   checks_hypotheses:
@@ -321,7 +314,7 @@ capabilities:
     \ vs CRM"
   status: planned_tier3
   tier: 3
-  command_template: TBD (planned capability; no CLI command yet)
+  command_template: TBD (planned; no CLI command yet)
   artifacts:
   - data_cache/{client}/crm_validation_{p1_slug}{p2_slug}.json
   checks_hypotheses:
@@ -341,7 +334,7 @@ capabilities:
     \u0440\u043E\u0439\u0441\u0442\u0432\u0430\u043C (mobile/desktop/tablet)"
   status: planned_tier3
   tier: 3
-  command_template: TBD (planned capability; no CLI command yet)
+  command_template: TBD (planned; no CLI command yet)
   artifacts:
   - data_cache/{client}/analysis_by_device_{p1_slug}{p2_slug}.json
   checks_hypotheses:
@@ -359,7 +352,7 @@ capabilities:
     \u043E\u0440\u043E\u0434\u0430)"
   status: planned_tier3
   tier: 3
-  command_template: TBD (planned capability; no CLI command yet)
+  command_template: TBD (planned; no CLI command yet)
   artifacts:
   - data_cache/{client}/analysis_by_geo_{p1_slug}{p2_slug}.json
   checks_hypotheses: []
