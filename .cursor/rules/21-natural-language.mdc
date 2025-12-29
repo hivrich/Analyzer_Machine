@@ -1,27 +1,25 @@
+cat > .cursor/rules/21-natural-language.mdc <<'MD'
 ---
-description: Natural-language runs: user speaks normally, agent follows the standard automatically
+description: Natural-language runs: user speaks normally, agent follows the standard loop automatically
 alwaysApply: true
 ---
 
-Если пользователь просит анализ (падение/рост/аномалия/разобраться/почему), считать это запросом на Run.
-Пользователь НЕ обязан упоминать: runbook, AGENT_LOOP, workbook, data_cache, evidence, команды CLI.
+Interpret natural-language requests as an analysis run. The user does NOT need to mention: workbooks, data_cache, evidence, CLI commands.
 
-Поведение по умолчанию (всегда):
+Source of truth:
+- Process: .cursor/rules/20-agent-loop.mdc (PLAN -> RUN -> REPORT)
+- Safety + mode selection: .cursor/rules/22-mode-switch.mdc
+- What can be executed: capabilities_registry.yaml (only implemented items)
 
-A) PLAN (сначала):
-1) Переформулировать задачу в 2–4 строки: client, периоды, KPI (трафик/конверсии/ecommerce).
-2) Выбрать существующие capabilities/команды CLI, которые нужны, и перечислить точные команды.
-3) Указать, какие артефакты будут созданы автоматически:
-   - data_cache/<client> у команды есть флаг --refresh, использовать его по умолчанию.
-   - Если --refresh не поддерживается, продолжить без него (без остановки).
-3) Прочитать созданный workbook(и) из d
-   - report.md: executive summary, facts (цифры), drivers (top вкладов), hypotheses (5–8) + какие данные нужны для проверки, next actions.
-   - evidence.txt: список путей к workbook и кэшам, на которых основан отчёт.
-5) Во время Run НЕ менять код и документы.
-   Тогда:
-   - не импровизировать,
-   - в отчёте добавить секцию "Capability missing" (что нужно добавить и какие артефакты должны появляться),
-   - код не менять без отдельной ом.
-- Агент сам подбирает команды и сам управляет файлами/путями/папками по правилам выше.
+Defaults:
+- Cache-first: do NOT force refresh unless the user explicitly asks for fresh data.
+- Use only registry-referenced CLI commands in OPERATOR (do not guess "other" commands).
 
-Ориентир принципов: docs/AGENT_LOOP.md
+If the request asks for something that cannot be computed with existing evidence/capabilities:
+- Ask exactly ONE short question to approve a PROXY metric (if appropriate), OR
+- Output "CAPABILITY MISSING: <name>" and STOP.
+Never present a PROXY as the requested metric.
+
+Outputs:
+- Always update reports/<client>/evidence.txt with resolved dates + canonical workbooks + related raw/norm/log paths.
+MD
