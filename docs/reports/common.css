@@ -499,7 +499,7 @@ section {
     }
     
     .container {
-        padding: 7px;
+        padding: 7px !important;
     }
     
     h1 {
