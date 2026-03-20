@@ -1,921 +1,501 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Favicon (inline SVG) -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%23ffd700;stop-opacity:1'/><stop offset='100%25' style='stop-color:%23ff8c00;stop-opacity:1'/></linearGradient></defs><rect x='20' y='180' width='140' height='312' rx='15' fill='url(%23grad)'/><rect x='186' y='80' width='140' height='412' rx='15' fill='url(%23grad)'/><rect x='352' y='20' width='140' height='472' rx='15' fill='url(%23grad)'/></svg>">
-
-  <title>🔍 Расследование: Падение органики и конверсий Part Academy</title>
-  <link rel="stylesheet" href="../common.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%23ffd700;stop-opacity:1'/><stop offset='100%25' style='stop-color:%23ff8c00;stop-opacity:1'/></linearGradient></defs><rect x='20' y='180' width='140' height='312' rx='15' fill='url(%23grad)'/><rect x='186' y='80' width='140' height='412' rx='15' fill='url(%23grad)'/><rect x='352' y='20' width='140' height='472' rx='15' fill='url(%23grad)'/></svg>">
+    <title>Part Academy: YTD 2026 vs YTD 2025</title>
+    <link rel="stylesheet" href="../common.css">
 </head>
-
 <body>
-  <div class="container">
-    <h1>🔍 Расследование: Падение органики и конверсий Part Academy</h1>
-    <div class="subtitle">Анализ падения органического трафика и конверсий</div>
+    <div class="container">
+        <h1>Part Academy</h1>
+        <div class="subtitle">YTD-расследование: что произошло с трафиком, SEO, покупками и мессенджерными лидами</div>
 
-    <div class="meta">
-      <strong>Клиент:</strong> partacademy<br>
-      <strong>Период 1:</strong> 2024-12-01 — 2024-12-25<br>
-      <strong>Период 2:</strong> 2025-12-01 — 2025-12-25<br>
-      <strong>Дата анализа:</strong> 2025-12-26<br>
-      <strong>Статус:</strong> ✅ Полное расследование завершено
+        <div class="meta">
+            <strong>Клиент:</strong> partacademy<br>
+            <strong>Период 1:</strong> 2025-01-01 — 2025-03-19<br>
+            <strong>Период 2:</strong> 2026-01-01 — 2026-03-19<br>
+            <strong>Дата анализа:</strong> 2026-03-20<br>
+            <strong>Основа:</strong> расследование `reports/partacademy/20260320-140848/` + ручной deep dive по Telegram / WhatsApp / Direct / Recommendation
+        </div>
+
+        <nav class="nav">
+            <ul>
+                <li><a href="#summary">Резюме</a></li>
+                <li><a href="#traffic">Трафик</a></li>
+                <li><a href="#pages">Страницы</a></li>
+                <li><a href="#conversion">Конверсии</a></li>
+                <li><a href="#hypotheses">Гипотезы</a></li>
+                <li><a href="#limits">Ограничения</a></li>
+                <li><a href="#actions">Что делать</a></li>
+            </ul>
+        </nav>
+
+        <div class="executive-summary" id="summary">
+            <h2>Резюме для команды</h2>
+            <p><strong>Главная проблема:</strong> бизнес потерял поисковый трафик на крупных evergreen-страницах, а новый рост сместился в более верхневороночные сценарии. В итоге Telegram почти удержался, но покупки просели намного сильнее трафика.</p>
+            <p><strong>Что сломалось сильнее всего:</strong> органика, коммерческое качество Direct, страницы <code>/20uprazhneniy</code>, <code>/journal/article/voice</code>, а также purchase-путь на <code>/trial-lesson</code> и московском разделе.</p>
+            <p><strong>Что это значит:</strong> модель «поиск → сильный лендинг → покупка» ослабла. Её частично заменила модель «новый контент / recommendation / direct → Telegram», которая даёт контакт, но заметно хуже доводит до денег.</p>
+        </div>
+
+        <h2>1. Ключевые метрики</h2>
+
+        <div class="key-metrics">
+            <div class="metric-card red">
+                <div class="metric-number">-26.9%</div>
+                <div class="metric-label">Общий трафик<br>168,217 → 122,993</div>
+            </div>
+            <div class="metric-card red">
+                <div class="metric-number">-36.3%</div>
+                <div class="metric-label">Search engine traffic<br>139,486 → 88,865</div>
+            </div>
+            <div class="metric-card red">
+                <div class="metric-number">-61.5%</div>
+                <div class="metric-label">Покупки<br>122 → 47</div>
+            </div>
+            <div class="metric-card green">
+                <div class="metric-number">-5.0%</div>
+                <div class="metric-label">Telegram-лиды<br>6,250 → 5,939</div>
+            </div>
+        </div>
+
+        <div class="alert alert-danger">
+            <strong>Ключевой вывод:</strong> падение бизнеса объясняется не только объёмом трафика. Покупки падают быстрее, чем визиты, а новый трафик часто идёт в Telegram и верх воронки вместо прямой монетизации.
+        </div>
+
+        <h2 id="traffic">2. Что произошло с трафиком</h2>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Источник</th>
+                        <th>Визиты P1</th>
+                        <th>Визиты P2</th>
+                        <th>Δ</th>
+                        <th>Δ %</th>
+                        <th>Вклад</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Search engine traffic</strong></td>
+                        <td>139,486</td>
+                        <td>88,865</td>
+                        <td class="negative">-50,621</td>
+                        <td class="negative">-36.3%</td>
+                        <td><strong>111.9%</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Direct traffic</td>
+                        <td>19,958</td>
+                        <td>24,632</td>
+                        <td class="positive">+4,674</td>
+                        <td class="positive">+23.4%</td>
+                        <td>-10.3%</td>
+                    </tr>
+                    <tr>
+                        <td>Link traffic</td>
+                        <td>1,280</td>
+                        <td>2,764</td>
+                        <td class="positive">+1,484</td>
+                        <td class="positive">+115.9%</td>
+                        <td>-3.3%</td>
+                    </tr>
+                    <tr>
+                        <td>Recommendation system traffic</td>
+                        <td>4</td>
+                        <td>1,422</td>
+                        <td class="positive">+1,418</td>
+                        <td class="positive">+35,450%</td>
+                        <td>-3.1%</td>
+                    </tr>
+                    <tr>
+                        <td>Internal traffic</td>
+                        <td>4,780</td>
+                        <td>3,603</td>
+                        <td class="negative">-1,177</td>
+                        <td class="negative">-24.6%</td>
+                        <td>2.6%</td>
+                    </tr>
+                    <tr>
+                        <td>Ad traffic</td>
+                        <td>1,890</td>
+                        <td>1,482</td>
+                        <td class="negative">-408</td>
+                        <td class="negative">-21.6%</td>
+                        <td>0.9%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="insight">
+            <div class="insight-title">Что важно</div>
+            <p>Почти всё падение объясняется органикой. При этом рост Direct, Link и Recommendation не компенсировал loss по поиску. Это не история “один рекламный канал выключили”, а системный сдвиг структуры спроса и качества входящего трафика.</p>
+        </div>
+
+        <div class="highlight-box">
+            <p><strong>Качество источников тоже ухудшилось.</strong></p>
+            <p>Search engine traffic: bounce rate <span class="negative">15.1% → 20.5%</span>, page depth <span class="negative">1.37 → 1.29</span>.</p>
+            <p>Direct traffic: bounce rate <span class="negative">14.8% → 39.3%</span>, page depth <span class="negative">1.66 → 1.49</span>.</p>
+            <p>Ad traffic: bounce rate <span class="negative">4.3% → 47.4%</span>, среднее время <span class="negative">111s → 46s</span>.</p>
+        </div>
+
+        <h2 id="pages">3. Слабые страницы</h2>
+
+        <h3>3.1. Самые просевшие landing pages</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Страница</th>
+                        <th>Визиты P1</th>
+                        <th>Визиты P2</th>
+                        <th>Δ</th>
+                        <th>Δ %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>/20uprazhneniy</strong></td>
+                        <td>13,588</td>
+                        <td>5,124</td>
+                        <td class="negative">-8,464</td>
+                        <td class="negative">-62.3%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>/journal/article/voice</strong></td>
+                        <td>18,250</td>
+                        <td>13,514</td>
+                        <td class="negative">-4,736</td>
+                        <td class="negative">-26.0%</td>
+                    </tr>
+                    <tr>
+                        <td>/5-principov-sistemy-stanislavskogo</td>
+                        <td>3,995</td>
+                        <td>1,470</td>
+                        <td class="negative">-2,525</td>
+                        <td class="negative">-63.2%</td>
+                    </tr>
+                    <tr>
+                        <td>/akterskoe-masterstvo-rech</td>
+                        <td>3,520</td>
+                        <td>1,758</td>
+                        <td class="negative">-1,762</td>
+                        <td class="negative">-50.1%</td>
+                    </tr>
+                    <tr>
+                        <td>/videovizitki</td>
+                        <td>2,591</td>
+                        <td>981</td>
+                        <td class="negative">-1,610</td>
+                        <td class="negative">-62.1%</td>
+                    </tr>
+                    <tr>
+                        <td class="positive"><strong>msk/courses/acting/start</strong></td>
+                        <td>735</td>
+                        <td>2,774</td>
+                        <td class="positive">+2,039</td>
+                        <td class="positive">+277.4%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>3.2. Самые просевшие SEO-страницы</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>SEO-страница</th>
+                        <th>Визиты P1</th>
+                        <th>Визиты P2</th>
+                        <th>Δ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>/20uprazhneniy</strong></td>
+                        <td>12,585</td>
+                        <td>4,418</td>
+                        <td class="negative">-8,167</td>
+                    </tr>
+                    <tr>
+                        <td><strong>/journal/article/voice</strong></td>
+                        <td>15,931</td>
+                        <td>11,055</td>
+                        <td class="negative">-4,876</td>
+                    </tr>
+                    <tr>
+                        <td><strong>/skorogovorki100</strong></td>
+                        <td>23,379</td>
+                        <td>20,661</td>
+                        <td class="negative">-2,718</td>
+                    </tr>
+                    <tr>
+                        <td>/5-principov-sistemy-stanislavskogo</td>
+                        <td>3,744</td>
+                        <td>1,314</td>
+                        <td class="negative">-2,430</td>
+                    </tr>
+                    <tr>
+                        <td>/videovizitki</td>
+                        <td>2,494</td>
+                        <td>875</td>
+                        <td class="negative">-1,619</td>
+                    </tr>
+                    <tr>
+                        <td class="positive">msk/courses/acting/start</td>
+                        <td>450</td>
+                        <td>1,045</td>
+                        <td class="positive">+595</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-warning">
+            <strong>Самая слабая страница:</strong> <code>/20uprazhneniy</code>. Она просела сразу по трём слоям: общий трафик, SEO-трафик и Telegram-лиды. Это крупнейшая точка потери, и её нужно проверять первой.
+        </div>
+
+        <h2 id="conversion">4. Что произошло с конверсиями</h2>
+
+        <h3>4.1. Покупки</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Показатель</th>
+                        <th>P1</th>
+                        <th>P2</th>
+                        <th>Δ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Покупки</td>
+                        <td>122</td>
+                        <td>47</td>
+                        <td class="negative">-75 (-61.5%)</td>
+                    </tr>
+                    <tr>
+                        <td>Purchase CR</td>
+                        <td>0.0725%</td>
+                        <td>0.0382%</td>
+                        <td class="negative">-0.0343 п.п.</td>
+                    </tr>
+                    <tr>
+                        <td>Search engine purchases</td>
+                        <td>55</td>
+                        <td>23</td>
+                        <td class="negative">-32</td>
+                    </tr>
+                    <tr>
+                        <td>Direct purchases</td>
+                        <td>32</td>
+                        <td>18</td>
+                        <td class="negative">-14</td>
+                    </tr>
+                    <tr>
+                        <td>Internal purchases</td>
+                        <td>23</td>
+                        <td>1</td>
+                        <td class="negative">-22</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Страница</th>
+                        <th>Покупки P1</th>
+                        <th>Покупки P2</th>
+                        <th>Δ</th>
+                        <th>Комментарий</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>/trial-lesson</strong></td>
+                        <td>10</td>
+                        <td>0</td>
+                        <td class="negative">-10</td>
+                        <td>Покупка исчезла полностью</td>
+                    </tr>
+                    <tr>
+                        <td><strong>msk/trial-lesson</strong></td>
+                        <td>9</td>
+                        <td>0</td>
+                        <td class="negative">-9</td>
+                        <td>Покупка исчезла полностью</td>
+                    </tr>
+                    <tr>
+                        <td><strong>msk/</strong></td>
+                        <td>8</td>
+                        <td>1</td>
+                        <td class="negative">-7</td>
+                        <td>CR резко просел</td>
+                    </tr>
+                    <tr>
+                        <td>/journal/article/voice</td>
+                        <td>12</td>
+                        <td>6</td>
+                        <td class="negative">-6</td>
+                        <td>И трафик, и монетизация ниже</td>
+                    </tr>
+                    <tr>
+                        <td>msk/courses/acting/start</td>
+                        <td>3</td>
+                        <td>0</td>
+                        <td class="negative">-3</td>
+                        <td>Трафик вырос, покупка исчезла</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>4.2. Telegram и WhatsApp</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Цель</th>
+                        <th>P1</th>
+                        <th>P2</th>
+                        <th>Δ</th>
+                        <th>CR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Telegram</strong></td>
+                        <td>6,250</td>
+                        <td>5,939</td>
+                        <td class="negative">-311 (-5.0%)</td>
+                        <td class="positive">3.72% → 4.83%</td>
+                    </tr>
+                    <tr>
+                        <td>Telegram из поиска</td>
+                        <td>4,909</td>
+                        <td>3,529</td>
+                        <td class="negative">-1,380</td>
+                        <td class="positive">3.52% → 3.97%</td>
+                    </tr>
+                    <tr>
+                        <td>Telegram из Direct</td>
+                        <td>850</td>
+                        <td>1,550</td>
+                        <td class="positive">+700</td>
+                        <td class="positive">4.26% → 6.29%</td>
+                    </tr>
+                    <tr>
+                        <td>Telegram из Recommendation</td>
+                        <td>0</td>
+                        <td>153</td>
+                        <td class="positive">+153</td>
+                        <td class="positive">0% → 10.76%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>WhatsApp</strong></td>
+                        <td>7</td>
+                        <td>0</td>
+                        <td class="negative">-7 (-100%)</td>
+                        <td class="negative">0.0042% → 0%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="insight">
+            <div class="insight-title">Главный перекос воронки</div>
+            <p>Telegram держится значительно лучше, чем покупки. Это значит, что верх воронки не развалился полностью, но люди чаще уходят в контактный сценарий и реже доходят до оплаты. Самый наглядный пример — <code>msk/courses/acting/start</code>: трафик <span class="positive">+2,039</span>, Telegram <span class="positive">23 → 73</span>, покупки <span class="negative">3 → 0</span>.</p>
+        </div>
+
+        <h3>4.3. Почему Direct сейчас подозрителен</h3>
+        <div class="highlight-box">
+            <p><strong>Direct вырос не как здоровый brand traffic.</strong></p>
+            <p>Он принёс больше визитов и больше Telegram-переходов, но при этом bounce rate вырос почти в 3 раза, а purchase CR упал больше чем вдвое.</p>
+            <p>Похоже либо на менее целевой трафик, либо на смещение атрибуции, либо на сценарий, в котором пользователь заходит, кликает в мессенджер, но не завершает покупку на сайте.</p>
+        </div>
+
+        <h2 id="hypotheses">5. Что подтверждается данными</h2>
+
+        <div class="alert alert-success">
+            <strong>Подтверждается:</strong> Part Academy потерял значимую часть поискового спроса на ключевых контентных и коммерческих страницах. Это основная причина общего снижения.
+        </div>
+
+        <div class="alert alert-success">
+            <strong>Подтверждается:</strong> коммерческая эффективность трафика просела сильнее самого трафика. Это видно по покупкам, purchase CR и страницам с выросшими Telegram-лидами, но исчезнувшими покупками.
+        </div>
+
+        <div class="alert alert-info">
+            <strong>Частично подтверждается:</strong> часть нового роста пришла из recommendation и direct на журнал, вебинары и отдельные московские страницы. Это выглядит как рост awareness и интереса к верхней части воронки, но не как прямой рост выручки.
+        </div>
+
+        <div class="alert alert-warning">
+            <strong>Требует ручной проверки:</strong> purchase-путь на <code>/trial-lesson</code>, <code>msk/trial-lesson</code> и <code>msk/courses/acting/start</code>. Там видно расхождение между интересом пользователя и деньгами. Нужно проверить реальный UX-путь, оффер, кнопку оплаты, события Метрики и возможный перевод пользователя в мессенджеры.
+        </div>
+
+        <h2 id="limits">6. Что было недоступно</h2>
+
+        <div class="alert alert-warning">
+            <strong>GSC не отработал:</strong> токен вернул <code>invalid_grant</code>.
+        </div>
+
+        <div class="alert alert-warning">
+            <strong>Яндекс.Вебмастер не отработал:</strong> по запросам был <code>METHOD_NOT_ALLOWED</code>, по индексации — <code>RESOURCE_NOT_FOUND</code>.
+        </div>
+
+        <p>Поэтому SEO-проблема подтверждена по Метрике очень уверенно, но по этому запуску нельзя честно разделить loss на падение позиций, CTR или индексацию. Для этого нужно починить доступы к GSC и Яндекс.Вебмастеру.</p>
+
+        <h2 id="actions">7. Что делать дальше</h2>
+
+        <ul class="checklist">
+            <li>Проверить в первую очередь <strong>/20uprazhneniy</strong>: контент, индексацию, внутренние ссылки, сниппеты, редиректы, CTA и актуальность оффера.</li>
+            <li>Проверить purchase-путь на <strong>/trial-lesson</strong>, <strong>msk/trial-lesson</strong> и <strong>msk/courses/acting/start</strong>: форма, кнопка оплаты, шаги после Telegram, корректность цели покупки.</li>
+            <li>Разобрать, что именно попадает в <strong>Direct traffic</strong>: откуда растёт трафик, есть ли неразмеченные кампании или мессенджерные переходы без UTM.</li>
+            <li>Отдельно оценить новый слой <strong>Recommendation system traffic</strong>: какие материалы дают максимум Telegram-лидов и можно ли увести их в более коммерческий путь.</li>
+            <li>Починить доступы к <strong>GSC</strong> и <strong>Яндекс.Вебмастеру</strong>, чтобы подтвердить механическую причину SEO-падения на уровне запросов, CTR и позиций.</li>
+        </ul>
+
+        <h2>8. Evidence</h2>
+
+        <div class="highlight-box">
+            <p><strong>Основные workbook-файлы:</strong></p>
+            <p><code>data_cache/partacademy/analysis_sources_2025010120250319__2026010120260319.json</code></p>
+            <p><code>data_cache/partacademy/analysis_pages_2025010120250319__2026010120260319.json</code></p>
+            <p><code>data_cache/partacademy/analysis_pages_by_source_search_engine_traffic_2025010120250319__2026010120260319.json</code></p>
+            <p><code>data_cache/partacademy/analysis_goals_by_source_3041010869_2025010120250319__2026010120260319.json</code></p>
+            <p><code>data_cache/partacademy/analysis_goals_by_page_3041010869_2025010120250319__2026010120260319.json</code></p>
+            <p><code>data_cache/partacademy/analysis_goals_by_source_293084879_2025010120250319__2026010120260319.json</code></p>
+            <p><code>data_cache/partacademy/analysis_goals_by_page_293084879_2025010120250319__2026010120260319.json</code></p>
+            <p><code>data_cache/partacademy/analysis_goals_by_source_293085189_2025010120250319__2026010120260319.json</code></p>
+            <p><code>reports/partacademy/20260320-140848/report.md</code></p>
+            <p><code>reports/partacademy/20260320-140848/report.html</code></p>
+        </div>
     </div>
 
-    <div class="executive-summary">
-      <h2>🎯 Executive Summary (Главные выводы)</h2>
-      <p><strong>Парадокс:</strong> Показы в Google ВЫРОСЛИ на 27-33% (+176K показов), НО клики УПАЛИ на 20-30% (-2.6K...-9.6K кликов). CTR обрушился на 40-45% (с 7.93% до 4.76% по запросам).</p>
-      <p style="margin-top: 15px;"><strong>Корневая проблема:</strong> Не "сайт пропал из индекса", а "сайт сполз вниз по выдаче" — алгоритм Google понизил релевантность/качество, и конкуренты выше забирают больше кликов.</p>
-      <p style="margin-top: 15px;"><strong>Главные драйверы падения:</strong> Падение позиций в Google (97% вклада), обвал запроса "жили были три китайца" (-1,131 клик), страница <code>/courses</code> потеряла 90% конверсий, московские страницы исчезли (-1,400 визитов).</p>
-    </div>
-
-    <h2>1. Ключевые метрики</h2>
-
-    <div class="key-metrics">
-      <div class="metric-card red">
-        <div class="metric-number">-27.6%</div>
-        <div class="metric-label">Падение трафика<br>44,243 → 32,040</div>
-      </div>
-      <div class="metric-card red">
-        <div class="metric-number">-36.6%</div>
-        <div class="metric-label">Падение органики<br>42,117 → 26,692</div>
-      </div>
-      <div class="metric-card red">
-        <div class="metric-number">-37%</div>
-        <div class="metric-label">Падение покупок<br>27 → 17</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-number">-40%</div>
-        <div class="metric-label">Падение CTR<br>7.93% → 4.76%</div>
-      </div>
-    </div>
-
-    <h3>Цифры в одной таблице</h3>
-    <p><strong>Методология:</strong> Сравнение периодов 2024-12-01 — 2024-12-25 vs 2025-12-01 — 2025-12-25</p>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Источник данных</th>
-          <th>Метрика</th>
-          <th>P1 (2024)</th>
-          <th>P2 (2025)</th>
-          <th>Δ</th>
-          <th>Δ %</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td rowspan="4"><strong>Яндекс.Метрика</strong></td>
-          <td>Общий трафик</td>
-          <td>44,243</td>
-          <td>32,040</td>
-          <td class="negative">-12,203</td>
-          <td class="negative">-27.6%</td>
-        </tr>
-        <tr>
-          <td>Органика (visits)</td>
-          <td>42,117</td>
-          <td>26,692</td>
-          <td class="negative">-15,425</td>
-          <td class="negative">-36.6%</td>
-        </tr>
-        <tr>
-          <td>Ecommerce покупки</td>
-          <td>27</td>
-          <td>17</td>
-          <td class="negative">-10</td>
-          <td class="negative">-37.0%</td>
-        </tr>
-        <tr>
-          <td>CR (конверсия)</td>
-          <td>0.05%</td>
-          <td>0.05%</td>
-          <td class="neutral">~0</td>
-          <td class="neutral">~0%</td>
-        </tr>
-        <tr>
-          <td rowspan="5"><strong>Google GSC</strong></td>
-          <td>Клики (queries)</td>
-          <td>13,159</td>
-          <td>10,510</td>
-          <td class="negative">-2,649</td>
-          <td class="negative">-20.1%</td>
-        </tr>
-        <tr>
-          <td>Показы (queries)</td>
-          <td>165,860</td>
-          <td>220,746</td>
-          <td class="positive">+54,886</td>
-          <td class="positive">+33.0%</td>
-        </tr>
-        <tr>
-          <td>CTR (queries)</td>
-          <td>7.93%</td>
-          <td>4.76%</td>
-          <td class="negative">-3.17 п.п.</td>
-          <td class="negative">-40.0%</td>
-        </tr>
-        <tr>
-          <td>Клики (pages)</td>
-          <td>31,390</td>
-          <td>21,770</td>
-          <td class="negative">-9,620</td>
-          <td class="negative">-30.6%</td>
-        </tr>
-        <tr>
-          <td>Показы (pages)</td>
-          <td>642,579</td>
-          <td>819,081</td>
-          <td class="positive">+176,502</td>
-          <td class="positive">+27.5%</td>
-        </tr>
-        <tr>
-          <td colspan="2">CTR (pages)</td>
-          <td>4.89%</td>
-          <td>2.66%</td>
-          <td class="negative">-2.23 п.п.</td>
-          <td class="negative">-45.6%</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h2>2. Факты (Evidence)</h2>
-
-    <h3>2.1. Яндекс.Метрика: Трафик по источникам</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Источник</th>
-          <th>P1 (2024)</th>
-          <th>P2 (2025)</th>
-          <th>Δ абс.</th>
-          <th>Δ %</th>
-          <th>Вклад %</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>Search engine</strong></td>
-          <td>42,117</td>
-          <td>26,692</td>
-          <td class="negative">-15,425</td>
-          <td class="negative">-36.6%</td>
-          <td><strong>97.0%</strong></td>
-        </tr>
-        <tr>
-          <td>Direct traffic</td>
-          <td>5,717</td>
-          <td>7,293</td>
-          <td class="positive">+1,576</td>
-          <td class="positive">+27.6%</td>
-          <td>-9.9%</td>
-        </tr>
-        <tr>
-          <td>Internal traffic</td>
-          <td>1,416</td>
-          <td>1,520</td>
-          <td class="positive">+104</td>
-          <td class="positive">+7.3%</td>
-          <td>-0.7%</td>
-        </tr>
-        <tr>
-          <td>Ad traffic</td>
-          <td>523</td>
-          <td>655</td>
-          <td class="positive">+132</td>
-          <td class="positive">+25.2%</td>
-          <td>-0.8%</td>
-        </tr>
-        <tr style="background: #f8f9fa; font-weight: 600;">
-          <td><strong>Итого</strong></td>
-          <td><strong>50,515</strong></td>
-          <td><strong>36,760</strong></td>
-          <td class="negative"><strong>-13,755</strong></td>
-          <td class="negative"><strong>-27.2%</strong></td>
-          <td></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="insight">
-      <p><strong>97% падения трафика</strong> — из-за органики (поисковой выдачи).</p>
-    </div>
-
-    <h3>2. Яндекс.Метрика: Landing Pages (топ падающих)</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Landing Page</th>
-          <th>P1 (2024)</th>
-          <th>P2 (2025)</th>
-          <th>Δ абс.</th>
-          <th>Δ %</th>
-          <th>Вклад %</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>/courses/improvisation/</strong></td>
-          <td>11,297</td>
-          <td>7,628</td>
-          <td class="negative">-3,669</td>
-          <td class="negative">-32.5%</td>
-          <td><strong>30.1%</strong></td>
-        </tr>
-        <tr>
-          <td><strong>/courses/kit/</strong></td>
-          <td>3,640</td>
-          <td>1,884</td>
-          <td class="negative">-1,756</td>
-          <td class="negative">-48.2%</td>
-          <td>14.4%</td>
-        </tr>
-        <tr>
-          <td>/courses/rechevedeniya-dlya-nachinayushchikh/</td>
-          <td>1,482</td>
-          <td>796</td>
-          <td class="negative">-686</td>
-          <td class="negative">-46.3%</td>
-          <td>5.6%</td>
-        </tr>
-        <tr>
-          <td>/courses/golos-i-ditsia/</td>
-          <td>1,115</td>
-          <td>461</td>
-          <td class="negative">-654</td>
-          <td class="negative">-58.7%</td>
-          <td>5.4%</td>
-        </tr>
-        <tr>
-          <td>msk.partacademy.ru/ (несколько)</td>
-          <td>~1,400</td>
-          <td>0</td>
-          <td class="negative">-1,400</td>
-          <td class="negative">-100%</td>
-          <td>~11.5%</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="highlight-box">
-      <p><strong>Вывод:</strong></p>
-      <ul style="margin-top: 10px;">
-        <li>Курс импровизации — ключевой лендинг, дал 30% вклада в падение.</li>
-        <li>Московские страницы (msk.partacademy.ru) <strong>полностью исчезли</strong> из трафика.</li>
-      </ul>
-    </div>
-
-    <h3>3. Google Search Console: Запросы (топ движения)</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Запрос</th>
-          <th>Клики P1</th>
-          <th>Клики P2</th>
-          <th>Δ кликов</th>
-          <th>Δ %</th>
-          <th>Позиция P1</th>
-          <th>Позиция P2</th>
-          <th>Δ позиции</th>
-          <th>Вклад %</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>скороговорки</strong></td>
-          <td>99</td>
-          <td>1,232</td>
-          <td class="positive">+1,133</td>
-          <td class="positive">+1,144%</td>
-          <td>9.7</td>
-          <td>7.4</td>
-          <td class="positive">-2.3 ⬆️</td>
-          <td>-42.8%</td>
-        </tr>
-        <tr>
-          <td><strong>жили были три китайца</strong></td>
-          <td>1,546</td>
-          <td>415</td>
-          <td class="negative">-1,131</td>
-          <td class="negative">-73%</td>
-          <td>4.5</td>
-          <td>4.4</td>
-          <td class="neutral">-0.1</td>
-          <td><strong>42.7%</strong> ⬆️</td>
-        </tr>
-        <tr>
-          <td><strong>диафрагмальное дыхание</strong></td>
-          <td>124</td>
-          <td>322</td>
-          <td class="positive">+198</td>
-          <td class="positive">+160%</td>
-          <td>5.1</td>
-          <td>2.3</td>
-          <td class="positive">-2.8 ⬆️</td>
-          <td>-7.5%</td>
-        </tr>
-        <tr>
-          <td>жили-были три китайца</td>
-          <td>176</td>
-          <td>6</td>
-          <td class="negative">-170</td>
-          <td class="negative">-97%</td>
-          <td>2.4</td>
-          <td>4.3</td>
-          <td class="negative">+1.9 ⬇️</td>
-          <td>6.4%</td>
-        </tr>
-        <tr>
-          <td>скороговорка</td>
-          <td>35</td>
-          <td>184</td>
-          <td class="positive">+149</td>
-          <td class="positive">+426%</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>-5.6%</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="highlight-box">
-      <p><strong>Ключевые находки:</strong></p>
-      <ul style="margin-top: 10px;">
-        <li><strong>"скороговорки"</strong> — взрывной рост (+1,133 клика), позиции улучшились.</li>
-        <li><strong>"жили были три китайца"</strong> — обвал (-1,131 клик), практически <strong>полностью нейтрализовал</strong> рост "скороговорок".</li>
-        <li><strong>Нетто-эффект:</strong> +1,133 - 1,131 = <strong>+2 клика</strong> от этих двух запросов, но общий баланс -2,649 кликов.</li>
-      </ul>
-    </div>
-
-    <h3>4. Google Search Console: Страницы (топ движения)</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Страница</th>
-          <th>Клики P1</th>
-          <th>Клики P2</th>
-          <th>Δ кликов</th>
-          <th>Δ %</th>
-          <th>Позиция P1</th>
-          <th>Позиция P2</th>
-          <th>Δ позиции</th>
-          <th>Вклад %</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>/skorogovorki100</strong></td>
-          <td>8,928</td>
-          <td>6,952</td>
-          <td class="negative">-1,976</td>
-          <td class="negative">-22%</td>
-          <td>9.9</td>
-          <td>7.3</td>
-          <td class="positive">-2.6 ⬆️</td>
-          <td><strong>20.5%</strong> ⬆️</td>
-        </tr>
-        <tr>
-          <td>/20uprazhneniy</td>
-          <td>1,729</td>
-          <td>949</td>
-          <td class="negative">-780</td>
-          <td class="negative">-45%</td>
-          <td>10.0</td>
-          <td>7.7</td>
-          <td class="positive">-2.3 ⬆️</td>
-          <td>8.1%</td>
-        </tr>
-        <tr>
-          <td>/journal/tpost/gk01t0ai11-uznai-lzhetsa</td>
-          <td>977</td>
-          <td>342</td>
-          <td class="negative">-635</td>
-          <td class="negative">-65%</td>
-          <td>8.1</td>
-          <td>4.0</td>
-          <td class="positive">-4.1 ⬆️</td>
-          <td>6.6%</td>
-        </tr>
-        <tr>
-          <td><strong>/diafragmalnoe-dyxanie</strong></td>
-          <td>804</td>
-          <td>1,417</td>
-          <td class="positive">+613</td>
-          <td class="positive">+76%</td>
-          <td>6.4</td>
-          <td>4.5</td>
-          <td class="positive">-1.8 ⬆️</td>
-          <td><strong>-6.4%</strong> ⬇️</td>
-        </tr>
-        <tr>
-          <td>/5-principov-sistemy-stanislavskogo</td>
-          <td>851</td>
-          <td>305</td>
-          <td class="negative">-546</td>
-          <td class="negative">-64%</td>
-          <td>8.7</td>
-          <td>4.2</td>
-          <td class="positive">-4.5 ⬆️</td>
-          <td>5.7%</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h4>Парадокс страницы <code>/skorogovorki100</code>:</h4>
-    <ul>
-      <li><strong>Позиции улучшились</strong> (с 9.9 до 7.3)</li>
-      <li><strong>Показы выросли вдвое</strong> (+88K показов)</li>
-      <li><strong>НО клики упали на 1,976</strong> (-22%)</li>
-      <li><strong>CTR обрушился</strong> с 7.74% до 3.42% (-4.33 п.п.)</li>
-    </ul>
-    <p style="margin-top: 10px;">
-      <strong>Объяснение:</strong><br>
-      Страница поднялась в выдаче, но <strong>конкуренты выше (позиции 1-6)</strong> забирают больше кликов. Пользователи видят partacademy.ru, но кликают на других (возможно, более привлекательные сниппеты/бренды).
-    </p>
-
-    <h3>5. Ecommerce конверсии (Метрика, цель 3041010869 "Покупка")</h3>
-
-    <h4>5.1 Покупки по источникам</h4>
-    <table>
-      <thead>
-        <tr>
-          <th>Источник</th>
-          <th>Goal P1</th>
-          <th>Goal P2</th>
-          <th>Δ goal</th>
-          <th>Δ %</th>
-          <th>CR P1</th>
-          <th>CR P2</th>
-          <th>Δ CR (pp)</th>
-          <th>Вклад %</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>Search engine</strong></td>
-          <td>11</td>
-          <td>4</td>
-          <td class="negative">-7</td>
-          <td class="negative">-63.6%</td>
-          <td>0.03%</td>
-          <td>0.01%</td>
-          <td class="negative">-0.01</td>
-          <td><strong>70.0%</strong></td>
-        </tr>
-        <tr>
-          <td><strong>Internal traffic</strong></td>
-          <td>5</td>
-          <td>0</td>
-          <td class="negative">-5</td>
-          <td class="negative">-100%</td>
-          <td>0.35%</td>
-          <td>0.00%</td>
-          <td class="negative">-0.35</td>
-          <td>50.0%</td>
-        </tr>
-        <tr>
-          <td>Direct traffic</td>
-          <td>7</td>
-          <td>9</td>
-          <td class="positive">+2</td>
-          <td class="positive">+28.6%</td>
-          <td>0.12%</td>
-          <td>0.12%</td>
-          <td class="positive">+0.01</td>
-          <td>-20.0%</td>
-        </tr>
-        <tr style="background: #f8f9fa; font-weight: 600;">
-          <td><strong>Итого</strong></td>
-          <td><strong>27</strong></td>
-          <td><strong>17</strong></td>
-          <td class="negative"><strong>-10</strong></td>
-          <td class="negative"><strong>-37%</strong></td>
-          <td><strong>0.05%</strong></td>
-          <td><strong>0.05%</strong></td>
-          <td><strong>~0</strong></td>
-          <td></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="success-box">
-      <strong>Вывод:</strong><br>
-      - 70% падения покупок — из-за органики.<br>
-      - CR стабилен (~0.05%), значит <strong>воронка работает нормально</strong>, проблема в <strong>количестве входящего трафика</strong>.
-    </div>
-
-    <h4>5.2 Покупки по страницам</h4>
-    <table>
-      <thead>
-        <tr>
-          <th>Landing Page</th>
-          <th>Goal P1</th>
-          <th>Goal P2</th>
-          <th>Δ goal</th>
-          <th>Δ %</th>
-          <th>Вклад %</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>/courses</strong></td>
-          <td>11</td>
-          <td>2</td>
-          <td class="negative"><strong>-9</strong></td>
-          <td class="negative">-81.8%</td>
-          <td><strong>90.0%</strong></td>
-        </tr>
-        <tr>
-          <td>Остальные</td>
-          <td>16</td>
-          <td>15</td>
-          <td class="negative">-1</td>
-          <td class="negative">-6.3%</td>
-          <td>10.0%</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="insight">
-      <div class="insight-title">⚠️ Критическая проблема</div>
-      <p>Страница <code>/courses</code> потеряла <strong>90% конверсий</strong> (с 11 до 2 покупок) — <strong>это главный драйвер падения продаж</strong>.</p>
-    </div>
-
-    <h2>3. Drivers (Корневые причины)</h2>
-
-    <h3>1. Падение позиций в Google (главный драйвер)</h3>
-    <div class="highlight-box">
-      <p><strong>Факты:</strong></p>
-      <ul style="margin-top: 10px;">
-        <li>Показы ВЫРОСЛИ на 27-33% → сайт не исчез из индекса</li>
-        <li>Клики УПАЛИ на 20-30% → пользователи кликают меньше</li>
-        <li>CTR обрушился на 40-45% → явный признак ухудшения позиций</li>
-      </ul>
-    </div>
-
-    <p><strong>Механизм:</strong></p>
-    <ol>
-      <li>Алгоритм Google понизил релевантность/качество сайта по ключевым запросам.</li>
-      <li>Сайт сполз с позиций 1-3 (где CTR 30-40%) на позиции 4-10 (где CTR 5-10%).</li>
-      <li>При этом количество показов выросло (сайт показывается по большему числу запросов/расширенной семантике), но клики упали.</li>
-    </ol>
-
-    <p><strong>Возможные причины понижения:</strong></p>
-    <ul>
-      <li><strong>Core Update</strong> (алгоритмическое обновление Google в декабре 2025).</li>
-      <li><strong>Конкуренты улучшились</strong> — новые сайты/контент обогнали partacademy.ru.</li>
-      <li><strong>Техническое качество сайта</strong> — Core Web Vitals, скорость, мобильная версия ухудшились.</li>
-      <li><strong>Контент устарел</strong> — страницы курсов не обновлялись, перестали соответствовать запросам пользователей.</li>
-      <li><strong>E-E-A-T сигналы</strong> (Expertise, Experience, Authoritativeness, Trustworthiness) — Google снизил доверие к сайту.</li>
-    </ul>
-
-    <h3>2. Страница <code>/skorogovorki100</code> — парадокс роста показов при падении кликов</h3>
-    <p><strong>Что произошло:</strong></p>
-    <ul>
-      <li>Страница поднялась в выдаче (с позиции 9.9 до 7.3).</li>
-      <li>Показы выросли вдвое (+88K).</li>
-      <li><strong>НО клики упали на 1,976</strong> (-22%).</li>
-      <li><strong>CTR обрушился</strong> с 7.74% до 3.42%.</li>
-    </ul>
-
-    <div class="highlight-box">
-      <p><strong>Объяснение:</strong></p>
-      <p>Конкуренция по запросу "скороговорки" <strong>резко выросла</strong>. Новые конкуренты на позициях 1-6 забирают больше кликов:</p>
-      <ul>
-        <li>Более привлекательные заголовки (title).</li>
-        <li>Более релевантные сниппеты (description).</li>
-        <li>Сильные бренды (известные порталы/издания).</li>
-      </ul>
-    </div>
-
-    <h3>3. Обвал запроса "жили были три китайца"</h3>
-    <p><strong>Что произошло:</strong></p>
-    <ul>
-      <li>С 1,546 кликов → 415 кликов (-73%).</li>
-      <li>Практически <strong>полностью нейтрализовал</strong> рост по "скороговорки" (+1,133).</li>
-    </ul>
-    <div class="highlight-box">
-      <p><strong>Возможные причины:</strong></p>
-      <ul>
-        <li><strong>Снижение интереса пользователей</strong> к этому запросу (сезонность, тренд закончился).</li>
-        <li><strong>Конкуренты выбили</strong> partacademy.ru с топовых позиций.</li>
-        <li><strong>Изменение выдачи</strong> — Google стал показывать другой тип контента (видео, блоги вместо курсов).</li>
-      </ul>
-    </div>
-
-    <h3>4. Страница <code>/courses</code> потеряла 90% конверсий</h3>
-    <p><strong>Что произошло:</strong></p>
-    <ul>
-      <li>С 11 покупок → 2 покупки.</li>
-      <li><strong>90% вклада</strong> в падение ecommerce продаж.</li>
-    </ul>
-    <div class="highlight-box">
-      <p><strong>Гипотезы:</strong></p>
-      <ol>
-        <li><strong>Трафик на <code>/courses</code> упал</strong> (проверить в Метрике: <code>-267</code> визитов, -5.6% по данным ранее).</li>
-        <li><strong>Изменение контента/структуры</strong> — возможно, страница была переделана, и новая версия конвертирует хуже.</li>
-        <li><strong>Качество трафика изменилось</strong> — пользователи с более низким намерением покупки (информационные запросы вместо коммерческих).</li>
-      </ol>
-    </div>
-
-    <h3>5. Московские страницы (msk.partacademy.ru) исчезли</h3>
-    <p><strong>Факт:</strong></p>
-    <ul>
-      <li>Было ~1,400 визитов → стало 0 (-100%).</li>
-      <li>Вклад ~11.5% в падение трафика.</li>
-    </ul>
-    <div class="highlight-box">
-      <p><strong>Причина:</strong><br>
-        Домен/поддомен <code>msk.partacademy.ru</code> <strong>закрыт/удалён</strong> или выставлен <code>noindex</code>.
-      </p>
-    </div>
-
-    <h2>4. Hypotheses (Гипотезы для проверки)</h2>
-
-    <h3>H1: Google Core Update в декабре 2025</h3>
-    <p><strong>Проверка:</strong></p>
-    <ul>
-      <li>Поиск новостей о Google Core Update в декабре 2025.</li>
-      <li>Сравнение с трендами в SEO-сообществе (форумы, Twitter, SEO-блоги).</li>
-      <li>Проверка динамики конкурентов (упали ли они тоже?).</li>
-    </ul>
-    <div class="highlight-box">
-      <p><strong>Если подтвердится:</strong><br>
-        Нужна <strong>re-optimization</strong> под новые критерии Google (E-E-A-T, контент, UX).
-      </p>
-    </div>
-
-    <h3>H2: Конкуренты улучшились / появились новые сильные игроки</h3>
-    <p><strong>Проверка:</strong></p>
-    <ul>
-      <li>Ручной анализ выдачи по топ-10 запросам (кто на позициях 1-3?).</li>
-      <li>Сравнение контента конкурентов (более полный/актуальный?).</li>
-      <li>Проверка backlink-профиля конкурентов (новые ссылки?).</li>
-    </ul>
-
-    <h3>H3: Техническое качество сайта ухудшилось</h3>
-    <p><strong>Проверка:</strong></p>
-    <ul>
-      <li><strong>Core Web Vitals</strong> (LCP, FID, CLS) — проверить в GSC или PageSpeed Insights.</li>
-      <li><strong>Мобильная версия</strong> — Mobile-Friendly Test.</li>
-      <li><strong>Скорость загрузки</strong> — GTmetrix, WebPageTest.</li>
-      <li><strong>Ошибки 4xx/5xx</strong> — проверить логи сервера.</li>
-    </ul>
-
-    <h3>H4: Контент устарел / не соответствует запросам пользователей</h3>
-    <p><strong>Проверка:</strong></p>
-    <ul>
-      <li>Сравнить контент страниц курсов с топ-3 конкурентами (полнота, актуальность, UX).</li>
-      <li>Проверить Search Intent (что именно ищут пользователи по этим запросам?).</li>
-      <li>Проверить дату последнего обновления страниц (свежесть контента).</li>
-    </ul>
-
-    <h3>H5: E-E-A-T сигналы снизились</h3>
-    <p><strong>Проверка:</strong></p>
-    <ul>
-      <li>Есть ли на страницах <strong>биография автора</strong>, <strong>экспертность</strong>, <strong>отзывы</strong>, <strong>awards</strong>?</li>
-      <li>Есть ли упоминания бренда на авторитетных ресурсах (news, образовательные порталы)?</li>
-      <li>Есть ли <strong>актуальная информация</strong> о компании (адрес, контакты, лицензии)?</li>
-    </ul>
-
-    <h3>H6: Сниппеты конкурентов более привлекательны</h3>
-    <p><strong>Проверка:</strong></p>
-    <ul>
-      <li>Сравнить <strong>title/description</strong> partacademy.ru с топ-3 конкурентами в выдаче.</li>
-      <li>Проверить наличие <strong>Rich Snippets</strong> (FAQ, рейтинги, breadcrumbs) у конкурентов.</li>
-      <li>Проверить, используют ли конкуренты <strong>эмоджи</strong> или <strong>call-to-action</strong> в title/description.</li>
-    </ul>
-
-    <h3>H7: Страница <code>/courses</code> изменилась / баг на странице</h3>
-    <p><strong>Проверка:</strong></p>
-    <ul>
-      <li>История Git (были ли изменения в коде страницы в ноябре-декабре 2025?).</li>
-      <li>Проверка вручную (работает ли форма заказа? Нет ли JS-ошибок?).</li>
-      <li>Проверка A/B-тестов (запускались ли эксперименты на странице?).</li>
-    </ul>
-
-    <h3>H8: Московский домен закрыт/удалён</h3>
-    <p><strong>Проверка:</strong></p>
-    <ul>
-      <li>Открыть в браузере <code>https://msk.partacademy.ru/</code> (работает ли?).</li>
-      <li>Проверить <code>robots.txt</code>: <code>https://msk.partacademy.ru/robots.txt</code> (есть ли Disallow: /?).</li>
-      <li>Проверить Яндекс.Вебмастер: статус индексации msk.partacademy.ru.</li>
-    </ul>
-
-    <h2>5. Next Actions (Приоритетные действия)</h2>
-
-    <h3>🚨 СРОЧНО (Quick Wins, 1-7 дней)</h3>
-
-    <h4>1. Проверить и исправить технические проблемы</h4>
-    <p><strong>Что делать:</strong></p>
-    <ul>
-      <li>[ ] Проверить <strong>Core Web Vitals</strong> в GSC (если красные показатели — исправить срочно).</li>
-      <li>[ ] Проверить <strong>мобильную версию</strong> (Mobile-Friendly Test).</li>
-      <li>[ ] Проверить <strong>логи сервера</strong> (есть ли всплеск 4xx/5xx ошибок в декабре?).</li>
-      <li>[ ] Проверить <strong>JS-ошибки</strong> в консоли браузера на ключевых страницах (<code>/courses</code>, <code>/skorogovorki100</code>).</li>
-    </ul>
-
-    <div class="highlight-box">
-      <p><strong>Инструменты:</strong></p>
-      <ul>
-        <li>Google Search Console → Core Web Vitals</li>
-        <li>PageSpeed Insights</li>
-        <li>Mobile-Friendly Test</li>
-        <li>DevTools Console (F12)</li>
-      </ul>
-    </div>
-
-    <h4>2. Проверить Московский домен</h4>
-    <ul>
-      <li>[ ] Открыть <code>https://msk.partacademy.ru/</code> — работает ли?</li>
-      <li>[ ] Проверить <code>robots.txt</code> — есть ли блокировка?</li>
-      <li>[ ] Если домен закрыт по ошибке — <strong>восстановить</strong> или настроить 301-редиректы на основной домен.</li>
-    </ul>
-
-    <h4>3. Проверить страницу <code>/courses</code></h4>
-    <ul>
-      <li>[ ] Открыть страницу вручную — работает ли форма заказа?</li>
-      <li>[ ] Проверить JS-ошибки в консоли.</li>
-      <li>[ ] Сравнить текущую версию с версией из Git (ноябрь 2024) — были ли изменения?</li>
-      <li>[ ] Если были изменения — провести A/B-тест (старая vs новая версия).</li>
-    </ul>
-
-    <h4>4. Улучшить сниппеты топ-3 падающих страниц</h4>
-    <ul>
-      <li>[ ] <code>/skorogovorki100</code> — переписать <strong>title/description</strong> (более яркие, с УТП).</li>
-      <li>[ ] <code>/courses</code> — добавить <strong>эмоциональный заголовок</strong> + <strong>call-to-action</strong>.</li>
-      <li>[ ] Добавить <strong>Schema.org разметку</strong> (FAQ, Course, BreadcrumbList).</li>
-    </ul>
-
-    <div class="highlight-box">
-      <p><strong>Пример улучшения title:</strong></p>
-      <p>❌ Было: "100 скороговорок для развития дикции"</p>
-      <p>✅ Стало: "100 Лучших Скороговорок для Идеальной Дикции | Проверено Актёрами ⭐"</p>
-    </div>
-
-    <h3>📈 СРЕДНИЙ ПРИОРИТЕТ (2-4 недели)</h3>
-
-    <h4>5. Обновить контент ключевых страниц</h4>
-    <ul>
-      <li>[ ] <code>/courses/improvisation/</code> — добавить <strong>видео</strong>, <strong>отзывы</strong>, <strong>примеры заданий</strong>.</li>
-      <li>[ ] <code>/courses/kit/</code> — обновить программу курса (актуальная информация, цены, даты).</li>
-      <li>[ ] <code>/skorogovorki100</code> — добавить <strong>аудио-примеры</strong>, <strong>упражнения</strong>, <strong>инфографику</strong>.</li>
-    </ul>
-    <p><strong>Цель:</strong> Сделать контент <strong>более полным и актуальным</strong>, чем у конкурентов.</p>
-
-    <h4>6. Усилить E-E-A-T сигналы</h4>
-    <ul>
-      <li>[ ] Добавить <strong>страницы преподавателей</strong> (биографии с фото, регалиями, опытом).</li>
-      <li>[ ] Добавить <strong>видео-отзывы</strong> учеников на ключевых страницах.</li>
-      <li>[ ] Получить <strong>упоминания в СМИ</strong> (PR, гостевые статьи в образовательных порталах).</li>
-      <li>[ ] Добавить <strong>актуальную информацию о компании</strong> (адрес, контакты, лицензии, awards).</li>
-    </ul>
-
-    <h4>7. Провести конкурентный анализ</h4>
-    <ul>
-      <li>[ ] Найти топ-3 конкурентов по ключевым запросам ("актёрское мастерство", "импровизация", "скороговорки").</li>
-      <li>[ ] Сравнить их контент с partacademy.ru (что у них лучше?).</li>
-      <li>[ ] Проверить их backlink-профиль (откуда ссылки? Какие якоря?).</li>
-      <li>[ ] Сделать список <strong>улучшений</strong> (что взять/адаптировать).</li>
-    </ul>
-
-    <h3>🔬 ДОЛГОСРОЧНО (1-3 месяца)</h3>
-
-    <h4>8. Стратегия recovery после Core Update</h4>
-    <ul>
-      <li>[ ] Изучить <strong>гайды Google</strong> по восстановлению после Core Update (Search Central Blog).</li>
-      <li>[ ] Провести <strong>Content Audit</strong> всех страниц (удалить/улучшить низкокачественные).</li>
-      <li>[ ] Усилить <strong>внутреннюю перелинковку</strong> (связать курсы друг с другом, blog → courses).</li>
-      <li>[ ] Запустить <strong>link building кампанию</strong> (качественные ссылки с образовательных/медиа ресурсов).</li>
-    </ul>
-
-    <h4>9. Мониторинг и A/B-тестирование</h4>
-    <ul>
-      <li>[ ] Настроить <strong>еженедельный мониторинг</strong> позиций по топ-20 запросам (Ahrefs/Semrush).</li>
-      <li>[ ] Запустить <strong>A/B-тесты</strong> на ключевых страницах (title/description, структура, CTA).</li>
-      <li>[ ] Измерять <strong>uplift</strong> (рост кликов/конверсий) после каждого изменения.</li>
-    </ul>
-
-    <h4>10. Диверсификация трафика</h4>
-    <ul>
-      <li>[ ] Увеличить <strong>рекламный бюджет</strong> (Google Ads, Яндекс.Директ) для компенсации падения органики.</li>
-      <li>[ ] Запустить <strong>контент-маркетинг</strong> (SEO-оптимизированные статьи в blog).</li>
-      <li>[ ] Развить <strong>YouTube-канал</strong> (видео-уроки по актёрскому мастерству → трафик на сайт).</li>
-      <li>[ ] Запустить <strong>email-маркетинг</strong> (рассылки для лидов, реактивация старых клиентов).</li>
-    </ul>
-
-    <h2>6. Conclusion (Итоговый вывод)</h2>
-
-    <h3>Корневая проблема</h3>
-    <div class="highlight-box">
-      <p><strong>Не "сайт исчез из индекса", а "сайт сполз вниз по выдаче".</strong></p>
-      <ul>
-        <li>Показы в Google <strong>выросли</strong> на 27-33%.</li>
-        <li>Но клики <strong>упали</strong> на 20-30%.</li>
-        <li>CTR <strong>обрушился</strong> на 40-45%.</li>
-      </ul>
-      <p style="margin-top: 15px;"><strong>Это классический паттерн</strong> понижения позиций после алгоритмического обновления или усиления конкуренции.</p>
-    </div>
-
-    <h3>Главные драйверы падения</h3>
-    <ol>
-      <li><strong>Падение позиций в Google</strong> (97% вклада) — алгоритм понизил релевантность/качество сайта.</li>
-      <li><strong>Обвал запроса "жили были три китайца"</strong> (-1,131 клик) — нейтрализовал рост по "скороговорки".</li>
-      <li><strong>Страница <code>/courses</code> потеряла 90% конверсий</strong> (с 11 до 2 покупок) — главный драйвер падения продаж.</li>
-      <li><strong>Московские страницы исчезли</strong> (-1,400 визитов) — возможно, домен закрыт.</li>
-    </ol>
-
-    <h3>Прогноз восстановления</h3>
-    <div class="success-box">
-      <p><strong>Оптимистичный сценарий (1-2 месяца):</strong></p>
-      <ul>
-        <li>Быстрые технические фиксы (Core Web Vitals, сниппеты) → +10-15% кликов.</li>
-        <li>Обновление контента → +5-10% кликов.</li>
-        <li>Recovery после Core Update → возврат к позициям P1.</li>
-      </ul>
-    </div>
-
-    <div class="highlight-box">
-      <p><strong>Реалистичный сценарий (3-6 месяцев):</strong></p>
-      <ul>
-        <li>Постепенное восстановление через комплексную SEO-оптимизацию.</li>
-        <li>Диверсификация трафика (реклама, YouTube, email) для компенсации.</li>
-      </ul>
-    </div>
-
-    <div class="alert alert-danger">
-      <p><strong>Пессимистичный сценарий (6-12 месяцев):</strong></p>
-      <ul>
-        <li>Если конкуренты укрепились — нужна полная редизайн/репозиционирование.</li>
-        <li>Если Google изменил критерии надолго — нужна стратегическая адаптация.</li>
-      </ul>
-    </div>
-
-    <h3>Рекомендации</h3>
-    <p><strong>Сейчас (неделя 1-2):</strong></p>
-    <ol>
-      <li>✅ Проверить и исправить технические проблемы.</li>
-      <li>✅ Проверить московский домен и страницу <code>/courses</code>.</li>
-      <li>✅ Улучшить сниппеты топ-3 падающих страниц.</li>
-    </ol>
-
-    <p><strong>Скоро (месяц 1-2):</strong></p>
-    <ol start="4">
-      <li>📈 Обновить контент ключевых страниц.</li>
-      <li>📈 Усилить E-E-A-T сигналы.</li>
-      <li>📈 Провести конкурентный анализ.</li>
-    </ol>
-
-    <p><strong>Долгосрочно (месяцы 2-6):</strong></p>
-    <ol start="7">
-      <li>🔬 Стратегия recovery после Core Update.</li>
-      <li>🔬 Мониторинг и A/B-тестирование.</li>
-      <li>🔬 Диверсификация трафика.</li>
-    </ol>
-
-    <div class="footer">
-      <p><strong>Артефакты:</strong></p>
-      <p>Evidence pack, Workbooks (Метрика), Workbooks (GSC)</p>
-      <p style="margin-top: 15px;"><strong>Последнее обновление:</strong> 2025-12-26 | <strong>Версия отчёта:</strong> FINAL (с данными GSC)</p>
-    </div>
-  </div>
-
-  <div class="scroll-top" id="scrollTop">↑</div>
-
-  <script>
-    // Smooth scroll for navigation links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
-      });
-    });
-
-    // Scroll to top button
-    const scrollTopBtn = document.getElementById('scrollTop');
-    window.addEventListener('scroll', () => {
-      if (window.pageYOffset > 300) {
-        scrollTopBtn.classList.add('visible');
-      } else {
-        scrollTopBtn.classList.remove('visible');
-      }
-    });
-    scrollTopBtn.addEventListener('click', () => {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    });
-  </script>
+    <div class="scroll-top" id="scrollTop">↑</div>
+
+    <script>
+        const scrollTopButton = document.getElementById("scrollTop");
+
+        window.addEventListener("scroll", () => {
+            if (window.scrollY > 500) {
+                scrollTopButton.classList.add("visible");
+            } else {
+                scrollTopButton.classList.remove("visible");
+            }
+        });
+
+        scrollTopButton.addEventListener("click", () => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+    </script>
 </body>
 </html>
