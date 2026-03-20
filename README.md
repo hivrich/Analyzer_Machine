@@ -68,6 +68,9 @@ ym_webmaster:
 # Список доступных команд
 python -m app.cli --help
 
+# Полное расследование по обычному запросу
+python -m app.cli investigate <client> --query "Разберись, почему упала органика в декабре 2025"
+
 # Сравнение источников трафика
 python -m app.cli analyze-sources <client> <p1_start> <p1_end> <p2_start> <p2_end> [--limit N] [--refresh]
 
@@ -75,10 +78,19 @@ python -m app.cli analyze-sources <client> <p1_start> <p1_end> <p2_start> <p2_en
 python -m app.cli analyze-sources partacademy 2024-12-01 2024-12-31 2025-12-01 2025-12-31 --refresh
 ```
 
+### Проверка окружения
+
+```bash
+python3 -m pytest tests -q
+python3 -m app.cli --help
+```
+
 ## Структура проекта
 
 ```
 Analyzer Machine/
+├── AGENTS.md                      # Точка входа для локальных AI агентов
+├── CONTRIBUTING.md                # Короткие правила для контрибьюторов
 ├── app/                          # Python модули
 │   ├── cli.py                    # CLI команды
 │   ├── config.py                 # Загрузка конфигов
@@ -90,6 +102,7 @@ Analyzer Machine/
 ├── docs/                          # Документация
 │   ├── samples/                  # Примеры данных
 │   ├── data_sources/             # Каталоги API
+│   ├── README.md                 # Индекс документации
 │   └── *.md                      # Документация
 ├── data_cache/                    # Кэш данных (не в git)
 ├── reports/                       # Отчёты (не в git)
@@ -101,9 +114,19 @@ Analyzer Machine/
 
 ## Работа с AI агентами
 
+### Для локальных coding agents
+
+Начинать стоит с `AGENTS.md` — это основной root-level onboarding для агента с доступом к коду и терминалу.
+
+Совместимые entry files:
+- `AGENTS.md` — source of truth
+- `CLAUDE.md` — shim для Claude
+- `GEMINI.md` — shim для Gemini
+- `.github/copilot-instructions.md` — инструкции для Copilot
+
 ### Для OpenAI Codex (браузер)
 
-См. `CODEX_SETUP.md` — подробные инструкции по работе в Codex.
+См. `CODEX_SETUP.md` — подробные инструкции именно для браузерного режима Codex.
 
 **Кратко:**
 - Codex может читать код и документацию
@@ -119,6 +142,18 @@ Analyzer Machine/
 - Интеграция с терминалом Cursor
 
 ## Основные команды
+
+### Полное расследование
+```bash
+python -m app.cli investigate <client> --query "<обычный запрос>" [--refresh]
+```
+
+Главный сценарий теперь такой:
+- ты пишешь запрос обычным языком
+- система сама выбирает Метрику, GSC и Яндекс.Вебмастер по смыслу запроса
+- сама собирает evidence и сохраняет готовый отчёт
+
+Подробно: `docs/INVESTIGATE.md`
 
 ### Анализ источников трафика
 ```bash
@@ -146,9 +181,14 @@ python -m app.cli analyze-gsc-pages <client> <p1_start> <p1_end> <p2_start> <p2_
 
 ## Документация
 
+- **Точка входа для локального агента:** `AGENTS.md`
+- **Правила для контрибьюторов:** `CONTRIBUTING.md`
+- **Индекс документации:** `docs/README.md`
+- **Совместимые agent entry files:** `CLAUDE.md`, `GEMINI.md`, `.github/copilot-instructions.md`
 - **Правила работы агента:** `CODEX_RULES.md`
 - **Настройка для Codex:** `CODEX_SETUP.md`
 - **Стандарт агента:** `docs/AGENT_LOOP.md`
+- **Главный путь расследования:** `docs/INVESTIGATE.md`
 - **Спецификация:** `docs/spec.md`
 - **Каталог API:** `docs/api_catalog.md`
 - **Примеры данных:** `docs/samples/`
@@ -193,11 +233,3 @@ python -m app.cli analyze-gsc-pages <client> <p1_start> <p1_end> <p2_start> <p2_
 - Обязателен smoke test после изменений
 
 Подробнее: `CODEX_RULES.md` раздел "Режимы работы"
-
-## Лицензия
-
-[Указать лицензию, если есть]
-
-## Контакты
-
-[Указать контакты, если нужно]

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -189,7 +189,7 @@ def create_workbook(
             "p1_end": p1_end,
             "p2_start": p2_start,
             "p2_end": p2_end,
-            "generated_at": datetime.utcnow().isoformat() + "Z",
+            "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
             "limit": limit,
             "refresh_used": refresh_used,
         },

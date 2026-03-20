@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from app.http_client import get_session, get_default_session, DEFAULT_NO_PROXY_HOSTS
+from app.http_client import DEFAULT_NO_PROXY_HOSTS, DEFAULT_TIMEOUT, get_default_session, get_session
 
 
 def test_get_session_without_proxy():
@@ -14,7 +14,7 @@ def test_get_session_without_proxy():
     with patch.dict(os.environ, {}, clear=True):
         session = get_session()
         assert session is not None
-        assert session.timeout == 60
+        assert session.timeout == DEFAULT_TIMEOUT
 
 
 def test_get_session_with_proxy():
@@ -41,7 +41,7 @@ def test_get_default_session():
     """Test default session with Yandex/Google APIs in no_proxy."""
     session = get_default_session()
     assert session is not None
-    assert session.timeout == 60
+    assert session.timeout == DEFAULT_TIMEOUT
 
 
 def test_session_request_bypass_proxy(monkeypatch):
@@ -70,4 +70,3 @@ def test_default_no_proxy_hosts():
     assert "api-metrika.yandex.net" in DEFAULT_NO_PROXY_HOSTS
     assert "api.webmaster.yandex.net" in DEFAULT_NO_PROXY_HOSTS
     assert "oauth2.googleapis.com" in DEFAULT_NO_PROXY_HOSTS
-

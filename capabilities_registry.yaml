@@ -1,6 +1,44 @@
 version: '1.0'
-updated: '2025-12-26'
+updated: '2026-03-20'
 capabilities:
+- id: C0
+  name: Investigate Orchestrator
+  description: "Полное расследование по обычному запросу: система сама строит гипотезы, запускает нужные срезы по раундам, добирает недостающие данные и сохраняет отчёт"
+  status: implemented
+  tier: 0
+  command_template: python -m app.cli investigate {client} --query "{query}" [--refresh]
+  artifacts:
+  - reports/{client}/{run_id}/report.md
+  - reports/{client}/{run_id}/report.html
+  - reports/{client}/{run_id}/evidence.json
+  - reports/{client}/{run_id}/evidence.txt
+  - data_cache/{client}/analysis_*.json
+  checks_hypotheses:
+  - H1.1
+  - H2.1
+  - H2.2
+  - H2.5
+  - H4.2
+  - H5.1
+  - H5.3
+  checks_signals:
+  - S1
+  - S2
+  - S4
+  - S5
+  priority: 0
+  depends_on:
+  - C1
+  - C2
+  - C2.1
+  - C3
+  - C3.1
+  - C5.1
+  - C5.2
+  - C6.1
+  - C6.2
+  data_source: orchestrator
+  implementation_notes: "- Работает итеративно, а не одним проходом\n- Раунд 1: общий срез\n- Следующие раунды: только под подтверждение или опровержение гипотез\n- Останавливается, когда причина найдена или новых полезных шагов больше нет\n"
 - id: C1
   name: Sources Period Compare
   description: "\u0421\u0440\u0430\u0432\u043D\u0435\u043D\u0438\u0435 \u0438\u0441\
@@ -40,9 +78,9 @@ capabilities:
     \u043E\u0433\u043E \u0438\u0441\u0442\u043E\u0447\u043D\u0438\u043A\u0430 (\u043D\
     \u0430\u043F\u0440., \u0442\u043E\u043B\u044C\u043A\u043E \u043E\u0440\u0433\u0430\
     \u043D\u0438\u043A\u0430)"
-  status: planned_tier1
+  status: implemented
   tier: 1
-  command_template: TBD (planned; no CLI command yet)
+  command_template: python -m app.cli analyze-pages-by-source {client} {p1_start} {p1_end} {p2_start} {p2_end} --source "{source}" --limit {limit}
   artifacts:
   - data_cache/{client}/metrika_pages_by_source_raw_{source_slug}_{p1_start}_{p1_end}.json
   - data_cache/{client}/metrika_pages_by_source_norm_{source_slug}_{p1_start}_{p1_end}.json
@@ -71,9 +109,9 @@ capabilities:
   description: "\u0410\u043D\u0430\u043B\u0438\u0437 \u0437\u0430\u043F\u0440\u043E\
     \u0441\u043E\u0432 Google Search Console: \u043A\u043B\u0438\u043A\u0438, \u043F\
     \u043E\u043A\u0430\u0437\u044B, CTR, \u043F\u043E\u0437\u0438\u0446\u0438\u0438"
-  status: planned_tier1
+  status: implemented
   tier: 1
-  command_template: TBD (planned; no CLI command yet)
+  command_template: python -m app.cli analyze-gsc-queries {client} {p1_start} {p1_end} {p2_start} {p2_end} --limit {limit}
   artifacts:
   - data_cache/{client}/gsc_queries_raw_{p1_start}_{p1_end}.json
   - data_cache/{client}/gsc_queries_norm_{p1_start}_{p1_end}.json
@@ -104,9 +142,9 @@ capabilities:
   description: "\u0410\u043D\u0430\u043B\u0438\u0437 \u0441\u0442\u0440\u0430\u043D\
     \u0438\u0446 Google Search Console: \u043A\u043B\u0438\u043A\u0438, \u043F\u043E\
     \u043A\u0430\u0437\u044B, CTR, \u043F\u043E\u0437\u0438\u0446\u0438\u0438"
-  status: planned_tier1
+  status: implemented
   tier: 1
-  command_template: TBD (planned; no CLI command yet)
+  command_template: python -m app.cli analyze-gsc-pages {client} {p1_start} {p1_end} {p2_start} {p2_end} --limit {limit}
   artifacts:
   - data_cache/{client}/gsc_pages_raw_{p1_start}_{p1_end}.json
   - data_cache/{client}/gsc_pages_norm_{p1_start}_{p1_end}.json
@@ -133,9 +171,9 @@ capabilities:
     \u0441\u043E\u0432 \u042F\u043D\u0434\u0435\u043A\u0441.\u0412\u0435\u0431\u043C\
     \u0430\u0441\u0442\u0435\u0440: \u043A\u043B\u0438\u043A\u0438, \u043F\u043E\u043A\
     \u0430\u0437\u044B, \u043F\u043E\u0437\u0438\u0446\u0438\u0438"
-  status: planned_tier1
+  status: implemented
   tier: 1
-  command_template: TBD (planned; no CLI command yet)
+  command_template: python -m app.cli analyze-ym-webmaster-queries {client} {p1_start} {p1_end} {p2_start} {p2_end} --limit {limit}
   artifacts:
   - data_cache/{client}/ym_webmaster_queries_raw_{p1_start}_{p1_end}.json
   - data_cache/{client}/ym_webmaster_queries_norm_{p1_start}_{p1_end}.json
@@ -167,9 +205,9 @@ capabilities:
     \u0435\u043A\u0441\u0430\u0446\u0438\u0438 \u042F\u043D\u0434\u0435\u043A\u0441\
     : EXCLUDED URLs, \u043F\u0440\u0438\u0447\u0438\u043D\u044B \u0438\u0441\u043A\
     \u043B\u044E\u0447\u0435\u043D\u0438\u044F"
-  status: planned_tier2
+  status: implemented
   tier: 1
-  command_template: TBD (planned; no CLI command yet)
+  command_template: python -m app.cli ym-webmaster-indexing {client} --status {status} --limit {limit} --offset {offset}
   artifacts:
   - data_cache/{client}/ym_webmaster_indexing_excluded_{snapshot_date}.json
   checks_hypotheses:
@@ -196,9 +234,9 @@ capabilities:
     \u0435\u043C\u0443 \u0441\u0430\u0439\u0442\u0443 (\u0431\u0435\u0437 \u0441\u0435\
     \u0433\u043C\u0435\u043D\u0442\u0430\u0446\u0438\u0438 \u043F\u043E \u0438\u0441\
     \u0442\u043E\u0447\u043D\u0438\u043A\u0430\u043C)"
-  status: planned_tier2
+  status: implemented
   tier: 2
-  command_template: TBD (planned; no CLI command yet)
+  command_template: python -m app.cli analyze-pages {client} {p1_start} {p1_end} {p2_start} {p2_end} --limit {limit}
   artifacts:
   - data_cache/{client}/analysis_pages_{p1_slug}{p2_slug}.json
   checks_hypotheses:
@@ -218,9 +256,9 @@ capabilities:
     \u0440\u0441\u0438\u0439 \u043F\u043E \u0446\u0435\u043B\u044F\u043C \u0432 \u0440\
     \u0430\u0437\u0440\u0435\u0437\u0435 \u0438\u0441\u0442\u043E\u0447\u043D\u0438\
     \u043A\u043E\u0432 \u0442\u0440\u0430\u0444\u0438\u043A\u0430"
-  status: planned_tier2
+  status: implemented
   tier: 2
-  command_template: TBD (planned; no CLI command yet)
+  command_template: python -m app.cli analyze-goals-by-source {client} {p1_start} {p1_end} {p2_start} {p2_end} --goal-id {goal_id} --limit {limit}
   artifacts:
   - data_cache/{client}/analysis_goals_by_source_{goal_id}_{p1_slug}{p2_slug}.json
   checks_hypotheses:
@@ -241,9 +279,9 @@ capabilities:
     \u0440\u0441\u0438\u0439 \u043F\u043E \u0446\u0435\u043B\u044F\u043C \u0432 \u0440\
     \u0430\u0437\u0440\u0435\u0437\u0435 \u0432\u0445\u043E\u0434\u043D\u044B\u0445\
     \ \u0441\u0442\u0440\u0430\u043D\u0438\u0446"
-  status: planned_tier2
+  status: implemented
   tier: 2
-  command_template: TBD (planned; no CLI command yet)
+  command_template: python -m app.cli analyze-goals-by-page {client} {p1_start} {p1_end} {p2_start} {p2_end} --goal-id {goal_id} --limit {limit}
   artifacts:
   - data_cache/{client}/analysis_goals_by_page_{goal_id}_{p1_slug}{p2_slug}.json
   checks_hypotheses:

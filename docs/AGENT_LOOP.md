@@ -1,320 +1,143 @@
-# Analyzer Machine — Agent Loop Standard (Cursor)
+# Analyzer Machine — Implemented Agent Loop
 
-## Цель
-Обеспечить воспроизводимый, доказательный анализ трафика/конверсий/SEO:
-- запросы → кэш → расчёты кодом → **компактные insights** → интерпретация LLM → отчёт
-- "Scripts count, LLM analyzes": тяжелые вычисления и поиск аномалий делают скрипты.
+Этот документ описывает фактический workflow агента в текущем репозитории.
 
-## Термины
-- Run: один запуск анализа по пользовательскому запросу.
-- Insight Pack: текстовая выжимка (summary) от Python-скрипта, которая показывает драйверы роста/падения и аномалии.
-- Evidence pack: набор файлов кэша + workbook + лог/вывод.
-- **PRL (Professional Reflection Loop)**: полный профессиональный цикл анализа с рефлексией и итерациями.
+Он отражает реально существующие команды из `app/cli.py`, а не будущие или экспериментальные идеи.
 
-## Вход от пользователя (человеческий язык)
-"Проверь падение трафика и конверсии, найди драйверы."
-"Почему упали конверсии после миграции?"
-"Какие есть возможности для роста?"
+## Базовые принципы
 
-## Жёсткие правила (must)
-1) **Всегда используй флаг `--format insights`** для команд анализа (`analyze-sources`, `analyze-pages` и т.д.).
-   - Читать гигантские таблицы (ASCII tables) запрещено, если этого явно не попросил пользователь.
-   - Экономим токены: Python сам найдет топ драйверов и аномалии.
-2) Никаких цифр без источника.
-3) Все расчёты делаются кодом.
-4) **⚡ ОБЯЗАТЕЛЬНЫЙ АУДИТ:** Каждая цифра, вывод, гипотеза должны пройти проверку перед публикацией.
-   - Используй `app.audit` для верификации данных.
-   - Каждая гипотеза должна иметь альтернативы.
-   - Confidence в выводах <50% = НЕ публиковать.
-   - См. подробно: `docs/AUDIT_RULES.md`
+1. Сначала evidence, потом интерпретация.
+2. Любые цифры должны ссылаться на workbook, raw/norm JSON или CLI output.
+3. Метрики считаются кодом, а не моделью.
+4. По умолчанию использовать `--format insights`, если пользователю не нужна таблица.
+5. Если capability отсутствует, говорить `CAPABILITY MISSING`.
 
----
+## Шаг 1. Классифицировать задачу
 
-# 🧠 Professional Reflection Loop (PRL) — ОСНОВНОЙ РЕЖИМ
+Перед запуском понять:
 
-**Для сложных запросов используй команду:**
+- клиент
+- периоды
+- KPI
+- источник данных: Метрика, GSC, Яндекс.Вебмастер
+- нужен ли только анализ или также правки кода
+
+Если пользователь не просит менять код, это `MODE: OPERATOR`.
+Если пользователь просит допилить capability, документацию или инфраструктуру, это `MODE: BUILDER`.
+
+## Шаг 2. Проверить готовность окружения
+
+Минимум перед run:
+
+1. существует `clients/<client>/config.yaml`
+2. задан `metrika.counter_id`
+3. для goals есть `goal_id` в конфиге или будет передан `--goal-id`
+4. для GSC настроены `gsc.site_url`, `GSC_CLIENT_ID`, `GSC_CLIENT_SECRET`, `GSC_REFRESH_TOKEN`
+5. для Яндекс.Вебмастера настроены `ym_webmaster.user_id`, `ym_webmaster.host_id`, `YM_WEBMASTER_TOKEN`
+
+Полезные команды:
+
 ```bash
-python -m app.cli analyze-professional <client> --query "<запрос>"
+python -m app.cli clients
+python -m app.cli show <client>
+python -m app.cli validate <client>
 ```
 
-PRL — это фундаментальный цикл работы профессионального аналитика:
+## Шаг 3. Выбрать минимальную capability
 
-## Фазы PRL
+### Предпочтительный путь для обычного запроса
 
-### ФАЗА 1: Professional Reflection (Профессиональная рефлексия)
-**Цель:** Понять, что пользователь РЕАЛЬНО хочет узнать.
+Если пользователь пишет задачу обычным языком, главный путь теперь такой:
 
-Агент задаёт себе вопросы:
-1. Что пользователь РЕАЛЬНО хочет узнать?
-2. Какой тип анализа нужен? (post-migration, conversion_drop, seo_performance, growth_opportunity и т.д.)
-3. Что я, как профессионал, должен проверить? (professional checklist)
-4. Какие вопросы критичны для полного ответа?
-5. Какой контекст мне нужен?
-
-**Инструмент:** `ReflectionEngine.reflect()`
-
-**Результат:**
-- User Intent (реальное намерение)
-- Analysis Type (классификация)
-- Professional Checklist (что профессионал должен проверить)
-- Critical Questions (критичные вопросы для ответа)
-- Complexity & Depth Required
-
----
-
-### ФАЗА 2: Hypothesis Formation (Формирование гипотез)
-**Цель:** Сформулировать 3-5 проверяемых гипотез.
-
-Для каждой гипотезы определить:
-- Какие данные нужны для проверки
-- Критерии подтверждения
-- Критерии опровержения
-- Альтернативные объяснения
-- Приоритет (1-5)
-
-**Инструмент:** `HypothesisEngine.generate_hypotheses()`
-
-**Пример гипотез для POST_MIGRATION:**
-- H1: Цели отслеживания перестали работать (priority=5)
-- H2: Техническая производительность ухудшилась (priority=4)
-- H3: Потеряны ключевые страницы (301 редиректы) (priority=5)
-- H4: Проблемы с индексацией (priority=4)
-
----
-
-### ФАЗА 3: Data Requirements Planning (Планирование данных)
-**Цель:** Определить ВСЕ нужные данные.
-
-Составить список:
-- Что берём из API (CLI команды)
-- Что спросить у пользователя
-- Что уже есть в контексте
-
-**Инструмент:** `DataPlanner.plan_data_collection()`
-
-**Проверка пробелов:**
-- Available: данные доступны через API
-- User Input Needed: требуются ответы пользователя
-- Unavailable: данные недоступны
-
----
-
-### ФАЗА 4: Data Collection (Сбор данных)
-**Цель:** Собрать все данные.
-
-Если нужен user input:
-- Задать вопросы СРАЗУ
-- Дождаться ответов
-- Только потом продолжить
-
-**Инструмент:** `AnalysisExecutor.execute_analysis()`
-
----
-
-### ФАЗА 5: Hypothesis Testing (Проверка гипотез)
-**Цель:** Проверить каждую гипотезу.
-
-Для каждой гипотезы:
-- Применить критерии подтверждения/опровержения
-- Присвоить статус: **confirmed** / **rejected** / **inconclusive**
-- Оценить уверенность (0.0-1.0)
-- Добавить reasoning (почему такой статус)
-
-**Инструмент:** `HypothesisEngine.test_hypothesis()`
-
----
-
-### ФАЗА 6: Confidence Assessment (Оценка уверенности)
-**Цель:** Оценить, можно ли уверенно ответить.
-
-**Критерии:**
-- Hypothesis confidence >= 80%?
-- Checklist coverage >= 80%?
-- Critical questions answered >= 100%?
-
-**Итоговая уверенность (взвешенное среднее):**
-```
-Overall = Hypothesis_Conf * 0.5 + Checklist_Cov * 0.3 + Questions * 0.2
+```bash
+python -m app.cli investigate <client> --query "<обычный запрос>" [--refresh]
 ```
 
-**Результат:**
-- **Confidence >= 80%**: готов к публикации ✅
-- **Confidence 50-80%**: частичный ответ ⚠️
-- **Confidence < 50%**: новый цикл 🔄
+`investigate` работает итеративно:
 
-**Инструмент:** `ConfidenceAssessor.assess()`
+1. сначала делает общий срез
+2. строит первые гипотезы
+3. сам решает, каких данных не хватает
+4. запускает следующий раунд только по нужным источникам
+5. останавливается, когда причина уже достаточно понятна или когда новых полезных шагов нет
 
----
+Низкоуровневые compare-команды ниже нужны либо для ручной проверки, либо как строительные блоки для `investigate`.
 
-### ФАЗА 7: Decision Point (Точка решения)
+### Реально реализованные compare-команды
 
-**Если Confidence < 50%:**
+```bash
+python -m app.cli analyze-sources <client> <p1_start> <p1_end> <p2_start> <p2_end> --format insights
+python -m app.cli analyze-pages <client> <p1_start> <p1_end> <p2_start> <p2_end> --format insights
+python -m app.cli analyze-pages-by-source <client> <p1_start> <p1_end> <p2_start> <p2_end> --source "<source>" --format insights
+python -m app.cli analyze-goals-by-source <client> <p1_start> <p1_end> <p2_start> <p2_end> --goal-id <goal_id> --format insights
+python -m app.cli analyze-goals-by-page <client> <p1_start> <p1_end> <p2_start> <p2_end> --goal-id <goal_id> --format insights
+python -m app.cli analyze-gsc-queries <client> <p1_start> <p1_end> <p2_start> <p2_end> --format insights
+python -m app.cli analyze-gsc-pages <client> <p1_start> <p1_end> <p2_start> <p2_end> --format insights
+python -m app.cli analyze-ym-webmaster-queries <client> <p1_start> <p1_end> <p2_start> <p2_end> --format insights
+```
 
-Запустить **НОВЫЙ ЦИКЛ:**
-1. Рефлексия о пробелах: чего не хватает?
-2. Новые гипотезы для объяснения пробелов
-3. Новые данные для проверки
-4. Вернуться к ФАЗЕ 3 (Data Requirements Planning)
+### Вспомогательные fetch-команды
 
-**Лимит:** 3 итерации максимум (по умолчанию)
+```bash
+python -m app.cli metrika-sources <client> <date1> <date2>
+python -m app.cli metrika-pages <client> <date1> <date2>
+python -m app.cli metrika-pages-by-source <client> <date1> <date2> --source "<source>"
+python -m app.cli metrika-goals-by-source <client> <date1> <date2> --goal-id <goal_id>
+python -m app.cli metrika-goals-by-page <client> <date1> <date2> --goal-id <goal_id>
+python -m app.cli gsc-queries <client> <date1> <date2>
+python -m app.cli gsc-pages <client> <date1> <date2>
+python -m app.cli ym-webmaster-queries <client> <date1> <date2>
+python -m app.cli ym-webmaster-indexing <client> --status EXCLUDED
+```
 
-**Если Confidence >= 50%:**
+## Шаг 4. Собрать и прочитать evidence
 
-Переход к генерации отчёта.
+После compare-команд ожидаем workbook в `data_cache/<client>/`.
 
----
+Типовые паттерны:
 
-### ФАЗА 8: Report Generation (Генерация отчёта)
-**Цель:** Сгенерировать профессиональный отчёт.
+- `analysis_sources_*.json`
+- `analysis_pages_*.json`
+- `analysis_pages_by_source_*.json`
+- `analysis_goals_by_source_*.json`
+- `analysis_goals_by_page_*.json`
+- `analysis_gsc_queries_*.json`
+- `analysis_gsc_pages_*.json`
+- `analysis_ym_webmaster_queries_*.json`
 
-**Структура отчёта:**
-1. **Executive Summary**
-   - Намерение пользователя
-   - Уверенность в выводах
-   - Ключевые выводы
-2. **Проверенные гипотезы**
-   - Подтверждённые (✅ с confidence)
-   - Опровергнутые (❌ с alternatives)
-   - Неопределённые (❓ с reasoning)
-3. **Неопределённые моменты** (если есть)
-4. **Рекомендации**
-   - Для повышения уверенности
-   - Выявленные пробелы
-5. **Audit Trail**
-   - Количество проверенных гипотез
-   - Собрано данных
-   - Компоненты уверенности
+Также рядом лежат raw и normalized файлы по каждому источнику.
 
-**Инструмент:** `ProfessionalAgent._generate_report()`
+## Шаг 5. Проверить результат
 
----
+Доступные audit helpers:
 
-## Преимущества PRL
+```bash
+python -m app.cli audit-data <client> <period_start> <period_end>
+python -m app.cli audit-metric "metric=value" --source <path-or-file> --client <client>
+python -m app.cli audit-report <report_path> [--strict]
+```
 
-1. **Профессиональное мышление:**
-   - Агент думает как консультант, а не как скрипт
-   - Явная рефлексия перед действием
+Замечание:
 
-2. **Hypothesis-driven:**
-   - Сначала гипотезы, потом данные
-   - Научный подход к анализу
+- `audit-report` сейчас делает базовый checklist, а не полный машинный разбор отчета.
+- Поэтому при важных выводах нужен и автоматический, и ручной sanity-check.
 
-3. **Итеративность:**
-   - Агент НЕ завершается при недостатке данных
-   - Автоматический запуск новых циклов
+## Шаг 6. Сформировать ответ
 
-4. **Прозрачность:**
-   - Явные гипотезы и их статус
-   - Уровень уверенности для каждого вывода
+Ответ по анализу должен содержать:
 
-5. **Адаптивность:**
-   - Разные типы анализа = разные чек-листы
-   - Автоопределение профиля
+- краткий executive summary
+- факты с evidence path
+- драйверы роста или падения
+- гипотезы и что нужно для проверки
+- next actions
 
----
+## CAPABILITY MISSING
 
-## Когда использовать PRL vs Low-Token Mode
+Если команда или нужный срез реально отсутствуют:
 
-**PRL (analyze-professional)** — для:
-- ❓ Сложных вопросов ("Почему упали конверсии?")
-- 🔍 Исследовательского анализа ("Что происходит с сайтом?")
-- 🧩 Проблем, требующих формирования гипотез
-- 📊 Ситуаций с недостатком данных (нужны итерации)
-
-**Low-Token Mode** — для:
-- ✅ Простых запросов ("Показать источники трафика")
-- 📈 Рутинного мониторинга
-- ⚡ Быстрых проверок одной метрики
-
----
-
-# Алгоритм Run (Low-Token Mode)
-### Шаг A. Intake
-- Определить client, периоды, KPI.
-
-### Шаг B. Smart Pull & Compute
-- Выполнить команды анализа с флагом `--format insights`.
-  *Пример:* `python -m app.cli analyze-sources client 2024-01-01 2024-01-31 2025-01-01 2025-01-31 --format insights`
-- Скрипт выдаст:
-  - Общий тренд (рост/падение).
-  - Топ-3 драйвера роста.
-  - Топ-3 драйвера падения.
-  - Новые/потерянные источники.
-  - Алерты по конверсии.
-
-### Шаг C. ⚡ AUDIT: Data Verification (ОБЯЗАТЕЛЬНО!)
-- **STOP! Проверка данных перед выводами.**
-- Для каждой ключевой цифры:
-  ```python
-  from app.audit import AuditEngine, DataPoint
-  
-  engine = AuditEngine(client_name)
-  result = engine.verify_data_source(DataPoint(
-      metric="visits_organic",
-      value=12499,
-      source_file="analysis_sources_*.json",
-      period="Q4 2025"
-  ))
-  
-  if result.status == "failed":
-      # НЕ использовать эту цифру!
-      print(f"⚠️ Data issue: {result.issues}")
-  ```
-- Проверить:
-  - ✅ Источник данных существует
-  - ✅ Метрика есть в источнике
-  - ✅ Значение совпадает
-  - ✅ Нет аномалий (>300% изменений)
-  - ✅ Кросс-проверка (если есть альтернативные источники)
-
-### Шаг D. Deep Dive (только если нужно)
-- Если Insight Report показал конкретную аномалию (например, "Direct traffic упал на 50%"), агент может запросить детализацию *только по этому сегменту*.
-- Или прочитать сохраненный workbook JSON (но не весь, а нужную секцию).
-
-### Шаг E. ⚡ AUDIT: Hypothesis Check (ОБЯЗАТЕЛЬНО!)
-- **STOP! Проверка гипотез перед формулированием рекомендаций.**
-- Для каждой гипотезы:
-  ```python
-  result = engine.check_hypothesis(
-      hypothesis="Форма Лаборатории сломана",
-      supporting_data=[...],  # минимум 3 точки данных
-      context={"type": "conversion_drop", "magnitude": -40}
-  )
-  
-  print(f"Confidence: {result.confidence:.0%}")
-  print(f"Alternatives: {result.alternative_hypotheses}")
-  
-  if result.confidence < 0.5:
-      # Гипотеза слабая, рассмотреть альтернативы!
-  ```
-- Обязательно:
-  - Минимум 3 альтернативные гипотезы
-  - Указать confidence (0-100%)
-  - План проверки гипотезы
-  - Учесть внешние факторы (сезонность, праздники)
-
-### Шаг F. Report
-- Написать отчет, основываясь на **проверенных** фактах из Insight Reports.
-- Каждая цифра = source file указан.
-- Каждая гипотеза = alternatives перечислены.
-- Каждый вывод = confidence указан.
-- **Для HTML-отчётов:** Следовать стандарту оформления из `docs/REPORT_STANDARD.md`
-  - Использовать `common.css` (НЕ создавать индивидуальные стили)
-  - Использовать единую структуру HTML (без лишних обёрток)
-  - Добавлять стандартный favicon
-  - Все отчёты должны выглядеть одинаково
-
-### Шаг G. ⚡ AUDIT: Final Report Check (ОБЯЗАТЕЛЬНО!)
-- **STOP! Итоговая проверка отчета перед публикацией.**
-- Запустить полный аудит:
-  ```bash
-  python -m app.audit report reports/<client>/REPORT.md --strict
-  ```
-- Критерии публикации:
-  - ✅ Passed (confidence >80%) → публиковать
-  - ⚠️ Warning (50-80%) → публиковать с оговорками
-  - ❌ Failed (<50%) → НЕ публиковать, доработать
-
-### Шаг H. Publish
-- Только если аудит passed/warning.
-- Добавить в отчет секцию "Audit Status" с результатами проверки.
+1. Явно написать `CAPABILITY MISSING: <name>`
+2. Указать, каких данных не хватает
+3. Указать ожидаемую CLI команду
+4. Указать ожидаемые артефакты в `data_cache/<client>/`
+5. Остановиться, не выдумывая промежуточный ответ

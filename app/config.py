@@ -11,17 +11,17 @@ CLIENTS_DIR = Path("clients")
 
 @dataclass(frozen=True)
 class ClientConfig:
-    client_name: str
-    site_name: str
-    timezone: str
-    counter_id: int
-    goal_id: int
-    currency: str
-    llm_enabled: bool
-    language: str
-    gsc_site_url: str
-    ym_webmaster_user_id: str
-    ym_webmaster_host_id: str
+    client_name: str = ""
+    site_name: str = ""
+    timezone: str = "Europe/Zurich"
+    counter_id: int = 0
+    goal_id: int = 0
+    currency: str = "RUB"
+    llm_enabled: bool = True
+    language: str = "ru"
+    gsc_site_url: str = ""
+    ym_webmaster_user_id: str = ""
+    ym_webmaster_host_id: str = ""
 
 
 def _read_yaml(path: Path) -> Dict[str, Any]:

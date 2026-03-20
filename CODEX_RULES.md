@@ -1,5 +1,8 @@
 # Analyzer Machine — Правила работы для AI агента
 
+> Примечание: для локальной агентной работы root-level source of truth теперь находится в `AGENTS.md`.
+> Этот документ сохраняется как расширенный справочник по режимам и принципам, но при конфликте приоритет у `AGENTS.md`.
+
 Этот документ содержит все правила работы агента Analyzer Machine. Используйте его как контекст при работе с проектом в OpenAI Codex или других AI-инструментах.
 
 ## Основные правила (Core Rules)
@@ -246,4 +249,3 @@ python -m app.cli metrika-goals-list <client> [--refresh]
 - Стандарт процесса: `docs/AGENT_LOOP.md`
 - Принципы работы: `docs/AGENT_LOOP.md`
 - Пример работы агента: `docs/agent_example_run.md`
-

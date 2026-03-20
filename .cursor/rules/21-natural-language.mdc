@@ -1,25 +1,23 @@
-cat > .cursor/rules/21-natural-language.mdc <<'MD'
 ---
-description: Natural-language runs: user speaks normally, agent follows the standard loop automatically
+description: Natural-language analysis requests should automatically map to the implemented CLI workflow
 alwaysApply: true
 ---
 
-Interpret natural-language requests as an analysis run. The user does NOT need to mention: workbooks, data_cache, evidence, CLI commands.
+Interpret natural-language requests about drops, growth, anomalies, SEO, traffic or conversions as analysis runs.
 
-Source of truth:
-- Process: .cursor/rules/20-agent-loop.mdc (PLAN -> RUN -> REPORT)
-- Safety + mode selection: .cursor/rules/22-mode-switch.mdc
-- What can be executed: capabilities_registry.yaml (only implemented items)
+The user does not need to mention:
+- workbooks
+- data_cache
+- evidence
+- CLI commands
 
-Defaults:
-- Cache-first: do NOT force refresh unless the user explicitly asks for fresh data.
-- Use only registry-referenced CLI commands in OPERATOR (do not guess "other" commands).
+Rules:
+- Prefer implemented commands from `capabilities_registry.yaml`.
+- In OPERATOR mode, do not invent new commands or pseudo-capabilities.
+- Default to cache-first. Use `--refresh` only when the user explicitly asks for fresh data or when stale cache is the likely blocker.
+- If the required slice does not exist, say `CAPABILITY MISSING` and stop instead of fabricating a proxy answer.
 
-If the request asks for something that cannot be computed with existing evidence/capabilities:
-- Ask exactly ONE short question to approve a PROXY metric (if appropriate), OR
-- Output "CAPABILITY MISSING: <name>" and STOP.
-Never present a PROXY as the requested metric.
-
-Outputs:
-- Always update reports/<client>/evidence.txt with resolved dates + canonical workbooks + related raw/norm/log paths.
-MD
+Primary references:
+- `AGENTS.md`
+- `.cursor/rules/20-agent-loop.mdc`
+- `.cursor/rules/22-mode-switch.mdc`

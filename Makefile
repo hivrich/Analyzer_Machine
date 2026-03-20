@@ -4,7 +4,7 @@ VENV   := .venv
 PY     := $(VENV)/bin/python
 PIP    := $(VENV)/bin/pip
 
-.PHONY: venv install help clients show validate reports test
+.PHONY: venv install help cli clients show validate reports test test-fast check
 
 venv:
 	python3 -m venv $(VENV)
@@ -15,6 +15,8 @@ install: venv
 
 help: install
 	$(PY) -m app.cli --help
+
+cli: help
 
 clients: install
 	$(PY) -m app.cli clients
@@ -38,5 +40,10 @@ reports: install
 	@echo "Reports generated in data_cache/$(CLIENT)/"
 
 test: install
-	$(PIP) install pytest pytest-mock
 	$(PY) -m pytest tests/ -v
+
+test-fast: install
+	$(PY) -m pytest tests -q
+
+check: test-fast
+	$(PY) -m app.cli --help

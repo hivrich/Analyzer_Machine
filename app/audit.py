@@ -48,7 +48,40 @@ class AuditEngine:
     def __init__(self, client_name: str, reports_dir: Path = Path("reports")):
         self.client_name = client_name
         self.reports_dir = reports_dir / client_name
+        self.cache_dir = Path("data_cache") / client_name
         self.audit_log: List[AuditResult] = []
+
+    def _resolve_source_path(self, source_file: str) -> Optional[Path]:
+        """
+        Resolve a source file against the most likely evidence locations.
+
+        Supported inputs:
+        - absolute paths
+        - repo-relative paths
+        - bare filenames inside reports/<client> or data_cache/<client>
+        """
+        raw_value = (source_file or "").strip()
+        if not raw_value:
+            return None
+
+        candidates: List[Path] = []
+        source_path = Path(raw_value)
+
+        if source_path.is_absolute():
+            candidates.append(source_path)
+        else:
+            candidates.extend(
+                [
+                    Path(raw_value),
+                    self.reports_dir / raw_value,
+                    self.cache_dir / raw_value,
+                ]
+            )
+
+        for candidate in candidates:
+            if candidate.exists():
+                return candidate
+        return None
     
     def verify_data_source(self, data_point: DataPoint) -> AuditResult:
         """
@@ -64,8 +97,8 @@ class AuditEngine:
         evidence = []
         
         # 1. Проверка существования файла
-        source_path = self.reports_dir / data_point.source_file
-        if not source_path.exists():
+        source_path = self._resolve_source_path(data_point.source_file)
+        if source_path is None:
             issues.append(f"Source file not found: {data_point.source_file}")
             return AuditResult(
                 claim=f"{data_point.metric} = {data_point.value}",
@@ -324,9 +357,22 @@ class AuditEngine:
         period: str
     ) -> Optional[Any]:
         """Ищет метрику в структуре данных"""
-        # Простая реализация - можно расширить
-        # TODO: Улучшить поиск по вложенным структурам
-        return data.get(metric)
+        if metric in data:
+            return data.get(metric)
+
+        for value in data.values():
+            if isinstance(value, dict):
+                nested = self._find_metric_in_data(value, metric, period)
+                if nested is not None:
+                    return nested
+            elif isinstance(value, list):
+                for item in value:
+                    if isinstance(item, dict):
+                        nested = self._find_metric_in_data(item, metric, period)
+                        if nested is not None:
+                            return nested
+
+        return None
     
     def _generate_alternative_hypotheses(
         self,
@@ -436,4 +482,3 @@ def create_audit_checklist(analysis_type: str) -> List[str]:
     }
     
     return checklists.get(analysis_type, [])
-

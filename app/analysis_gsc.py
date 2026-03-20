@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
@@ -163,7 +163,7 @@ def create_workbook(
             "p1_end": p1_end,
             "p2_start": p2_start,
             "p2_end": p2_end,
-            "generated_at": datetime.utcnow().isoformat() + "Z",
+            "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
             "limit": limit,
             "refresh_used": refresh_used,
         },
@@ -178,5 +178,4 @@ def workbook_filename(kind: str, p1_start: str, p1_end: str, p2_start: str, p2_e
         f"{p1_start.replace('-', '')}{p1_end.replace('-', '')}"
         f"__{p2_start.replace('-', '')}{p2_end.replace('-', '')}.json"
     )
-
 

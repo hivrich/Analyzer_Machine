@@ -55,6 +55,7 @@ from app.analysis_ym_webmaster import (
 )
 from app.ym_webmaster_client import YMWebmasterClient, normalize_webmaster_indexing
 from app.analysis_insights import print_insights
+from app.orchestrator import investigate
 
 # Загружаем переменные окружения из .env
 load_dotenv()
@@ -1802,6 +1803,76 @@ def analyze_goals_by_page_cmd(
     rprint(f"  Δ CR (pp): {totals['total_delta_cr_pp']:.2f}")
 
 
+@app.command("investigate")
+def investigate_cmd(
+    client: str = typer.Argument(..., help="Имя клиента"),
+    query: str = typer.Option(..., "--query", help="Запрос обычным языком"),
+    refresh: bool = typer.Option(False, "--refresh", help="Обновить данные у доступных источников"),
+    p1_start: str = typer.Option("", "--p1-start", help="Период 1: начало (опционально)"),
+    p1_end: str = typer.Option("", "--p1-end", help="Период 1: конец (опционально)"),
+    p2_start: str = typer.Option("", "--p2-start", help="Период 2: начало (опционально)"),
+    p2_end: str = typer.Option("", "--p2-end", help="Период 2: конец (опционально)"),
+):
+    """
+    Полное расследование по клиенту из обычного запроса:
+    система сама выбирает источники, запускает анализы и сохраняет отчёт.
+    """
+    try:
+        report, analysis, executed_steps = investigate(
+            client=client,
+            query=query,
+            refresh=refresh,
+            p1_start=p1_start or None,
+            p1_end=p1_end or None,
+            p2_start=p2_start or None,
+            p2_end=p2_end or None,
+        )
+    except Exception as e:
+        rprint(f"[bold red]Error:[/bold red] {e}")
+        raise typer.Exit(code=1)
+
+    rprint(f"[bold]Итог:[/bold] {analysis['summary']}")
+    rprint(f"[bold]Период:[/bold] {analysis['period']['description']}")
+    if analysis["goal_selection"].get("goal_id"):
+        rprint(
+            f"[bold]Goal:[/bold] {analysis['goal_selection']['goal_id']} "
+            f"({analysis['goal_selection']['source']})"
+        )
+
+    if analysis["facts"]:
+        rprint("\n[bold]Факты:[/bold]")
+        for item in analysis["facts"][:5]:
+            rprint(f"- {item['title']}: {item['value']}")
+
+    if analysis["hypotheses"]:
+        rprint("\n[bold]Гипотезы:[/bold]")
+        for item in analysis["hypotheses"][:5]:
+            rprint(f"- {item['title']} [{item['status']}, {item['confidence']}]")
+
+    if analysis["availability_notes"]:
+        rprint("\n[bold]Ограничения:[/bold]")
+        for note in analysis["availability_notes"]:
+            rprint(f"- {note}")
+
+    loop_info = analysis.get("loop") or {}
+    if loop_info:
+        rounds = loop_info.get("rounds") or []
+        rprint("\n[bold]Цикл расследования:[/bold]")
+        rprint(f"- Раундов: {len(rounds)}")
+        if loop_info.get("stop_reason"):
+            rprint(f"- Остановка: {loop_info['stop_reason']}")
+
+    rprint("\n[bold]Отчёт:[/bold]")
+    rprint(f"- Markdown: {report.markdown_path}")
+    rprint(f"- HTML: {report.html_path}")
+    rprint(f"- Evidence JSON: {report.evidence_json_path}")
+    rprint(f"- Evidence TXT: {report.evidence_txt_path}")
+
+    failed = [step for step in executed_steps if not step.success]
+    if failed and len(failed) == len(executed_steps):
+        raise typer.Exit(code=1)
+
+
 @app.command()
 def audit_data(
     client: str = typer.Argument(..., help="Имя клиента"),
@@ -1831,28 +1902,40 @@ def audit_data(
     issues = []
     
     # 1. Проверка директорий
-    if not reports_dir.exists():
-        issues.append(f"Reports directory not found: {reports_dir}")
-    
     if not cache_dir.exists():
         issues.append(f"Cache directory not found: {cache_dir}")
     
-    # 2. Проверка наличия workbooks
-    expected_files = [
-        f"analysis_sources_*_{period_start}_{period_end}.json",
-        f"analysis_pages_*_{period_start}_{period_end}.json",
+    # 2. Проверка наличия workbook-файлов, в имени которых встречается период
+    period_slug = f"{period_start.replace('-', '')}{period_end.replace('-', '')}"
+    workbook_prefixes = [
+        "analysis_sources_",
+        "analysis_pages_",
+        "analysis_pages_by_source_",
+        "analysis_goals_by_source_",
+        "analysis_goals_by_page_",
+        "analysis_gsc_queries_",
+        "analysis_gsc_pages_",
+        "analysis_ym_webmaster_queries_",
     ]
-    
-    for pattern in expected_files:
-        files = list(cache_dir.glob(pattern))
-        if not files:
-            issues.append(f"Missing workbook: {pattern}")
-        else:
-            # Проверка актуальности
-            for file in files:
-                age_days = (datetime.now() - datetime.fromtimestamp(file.stat().st_mtime)).days
-                if age_days > 7:
-                    issues.append(f"Stale data ({age_days} days old): {file.name}")
+
+    found_any = False
+    for prefix in workbook_prefixes:
+        files = sorted(cache_dir.glob(f"{prefix}*.json"))
+        matching = [file for file in files if period_slug in file.name]
+        if not matching:
+            continue
+
+        found_any = True
+        for file in matching:
+            age_days = (datetime.now() - datetime.fromtimestamp(file.stat().st_mtime)).days
+            if age_days > 7:
+                issues.append(f"Stale data ({age_days} days old): {file.name}")
+
+    if not found_any:
+        issues.append(
+            "No workbook files found for the requested period in data_cache/"
+            f"{client} (expected period slug {period_slug})"
+        )
     
     if issues:
         rprint("[red]❌ Audit FAILED:[/red]")
