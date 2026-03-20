@@ -10,14 +10,14 @@
 <body>
     <div class="container">
         <h1>Part Academy</h1>
-        <div class="subtitle">YTD-расследование: что произошло с трафиком, SEO, покупками и мессенджерными лидами</div>
+        <div class="subtitle">Подробное YTD-расследование: трафик, SEO, страницы, покупки и мессенджерные лиды</div>
 
         <div class="meta">
             <strong>Клиент:</strong> partacademy<br>
             <strong>Период 1:</strong> 2025-01-01 — 2025-03-19<br>
             <strong>Период 2:</strong> 2026-01-01 — 2026-03-19<br>
             <strong>Дата анализа:</strong> 2026-03-20<br>
-            <strong>Основа:</strong> расследование `reports/partacademy/20260320-140848/` + ручной deep dive по Telegram / WhatsApp / Direct / Recommendation
+            <strong>Основа:</strong> расследование `reports/partacademy/20260320-140848/` + ручной deep dive по Telegram, WhatsApp, Direct и Recommendation
         </div>
 
         <nav class="nav">
@@ -26,17 +26,19 @@
                 <li><a href="#traffic">Трафик</a></li>
                 <li><a href="#pages">Страницы</a></li>
                 <li><a href="#conversion">Конверсии</a></li>
+                <li><a href="#drivers">Драйверы</a></li>
                 <li><a href="#hypotheses">Гипотезы</a></li>
-                <li><a href="#limits">Ограничения</a></li>
                 <li><a href="#actions">Что делать</a></li>
+                <li><a href="#limits">Ограничения</a></li>
+                <li><a href="#evidence">Evidence</a></li>
             </ul>
         </nav>
 
         <div class="executive-summary" id="summary">
-            <h2>Резюме для команды</h2>
-            <p><strong>Главная проблема:</strong> бизнес потерял поисковый трафик на крупных evergreen-страницах, а новый рост сместился в более верхневороночные сценарии. В итоге Telegram почти удержался, но покупки просели намного сильнее трафика.</p>
-            <p><strong>Что сломалось сильнее всего:</strong> органика, коммерческое качество Direct, страницы <code>/20uprazhneniy</code>, <code>/journal/article/voice</code>, а также purchase-путь на <code>/trial-lesson</code> и московском разделе.</p>
-            <p><strong>Что это значит:</strong> модель «поиск → сильный лендинг → покупка» ослабла. Её частично заменила модель «новый контент / recommendation / direct → Telegram», которая даёт контакт, но заметно хуже доводит до денег.</p>
+            <h2>Executive Summary</h2>
+            <p><strong>Что произошло:</strong> общий трафик упал на <strong>26.9%</strong>, а поисковый трафик на <strong>36.3%</strong>. Крупнейшие потери пришлись на evergreen-страницы, которые раньше кормили и SEO, и верх воронки: <code>/20uprazhneniy</code>, <code>/journal/article/voice</code>, <code>/skorogovorki100</code>, <code>/5-principov-sistemy-stanislavskogo</code>.</p>
+            <p><strong>Что хуже всего для бизнеса:</strong> покупки просели сильнее трафика: <strong>122 → 47</strong> (<strong>-61.5%</strong>), а purchase CR снизился с <strong>0.0725%</strong> до <strong>0.0382%</strong>. Это означает, что проблема не только в объёме трафика, но и в коммерческом качестве потока.</p>
+            <p><strong>Почему отчёт не “про один канал”:</strong> рост Direct, Link и Recommendation частично компенсировал падение охвата, но этот рост ушёл в более верхневороночные сценарии. Telegram удержался относительно неплохо (<strong>-5.0%</strong>), а деньги нет. Значит модель «поиск → сильный лендинг → покупка» ослабла и частично сместилась в модель «контент / direct / recommendation → Telegram».</p>
         </div>
 
         <h2>1. Ключевые метрики</h2>
@@ -56,15 +58,15 @@
             </div>
             <div class="metric-card green">
                 <div class="metric-number">-5.0%</div>
-                <div class="metric-label">Telegram-лиды<br>6,250 → 5,939</div>
+                <div class="metric-label">Telegram<br>6,250 → 5,939</div>
             </div>
         </div>
 
         <div class="alert alert-danger">
-            <strong>Ключевой вывод:</strong> падение бизнеса объясняется не только объёмом трафика. Покупки падают быстрее, чем визиты, а новый трафик часто идёт в Telegram и верх воронки вместо прямой монетизации.
+            <strong>Коротко:</strong> бизнес потерял SEO-трафик на ключевых страницах, а новый рост пришёл в каналы и сценарии с более слабой монетизацией. Это уже не просто падение посещаемости, а ухудшение структуры спроса и пути к оплате.
         </div>
 
-        <h2 id="traffic">2. Что произошло с трафиком</h2>
+        <h2 id="traffic">2. Трафик: что именно просело, а что выросло</h2>
 
         <div class="table-wrapper">
             <table>
@@ -75,7 +77,7 @@
                         <th>Визиты P2</th>
                         <th>Δ</th>
                         <th>Δ %</th>
-                        <th>Вклад</th>
+                        <th>Вклад в общий итог</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -120,6 +122,14 @@
                         <td>2.6%</td>
                     </tr>
                     <tr>
+                        <td>Social network traffic</td>
+                        <td>759</td>
+                        <td>191</td>
+                        <td class="negative">-568</td>
+                        <td class="negative">-74.8%</td>
+                        <td>1.3%</td>
+                    </tr>
+                    <tr>
                         <td>Ad traffic</td>
                         <td>1,890</td>
                         <td>1,482</td>
@@ -132,18 +142,71 @@
         </div>
 
         <div class="insight">
-            <div class="insight-title">Что важно</div>
-            <p>Почти всё падение объясняется органикой. При этом рост Direct, Link и Recommendation не компенсировал loss по поиску. Это не история “один рекламный канал выключили”, а системный сдвиг структуры спроса и качества входящего трафика.</p>
+            <div class="insight-title">Что это значит</div>
+            <p>Почти всё общее падение объясняется поиском. Рост Direct, Link и Recommendation не выглядит “здоровой заменой” потерянной органике: он не привёл к сопоставимому восстановлению покупок.</p>
+        </div>
+
+        <h3>2.1. Что ухудшилось по качеству трафика</h3>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Источник</th>
+                        <th>Bounce P1</th>
+                        <th>Bounce P2</th>
+                        <th>Page depth P1</th>
+                        <th>Page depth P2</th>
+                        <th>Avg sec P1</th>
+                        <th>Avg sec P2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Search engine traffic</strong></td>
+                        <td>15.1%</td>
+                        <td class="negative">20.5%</td>
+                        <td>1.37</td>
+                        <td class="negative">1.29</td>
+                        <td>80.7</td>
+                        <td>104.4</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Direct traffic</strong></td>
+                        <td>14.8%</td>
+                        <td class="negative">39.3%</td>
+                        <td>1.66</td>
+                        <td class="negative">1.49</td>
+                        <td>110.6</td>
+                        <td>109.8</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ad traffic</strong></td>
+                        <td>4.3%</td>
+                        <td class="negative">47.4%</td>
+                        <td>2.12</td>
+                        <td class="negative">1.29</td>
+                        <td>111.3</td>
+                        <td class="negative">46.1</td>
+                    </tr>
+                    <tr>
+                        <td>Link traffic</td>
+                        <td>12.5%</td>
+                        <td class="positive">8.6%</td>
+                        <td>2.46</td>
+                        <td>1.92</td>
+                        <td>189.9</td>
+                        <td>177.5</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
         <div class="highlight-box">
-            <p><strong>Качество источников тоже ухудшилось.</strong></p>
-            <p>Search engine traffic: bounce rate <span class="negative">15.1% → 20.5%</span>, page depth <span class="negative">1.37 → 1.29</span>.</p>
-            <p>Direct traffic: bounce rate <span class="negative">14.8% → 39.3%</span>, page depth <span class="negative">1.66 → 1.49</span>.</p>
-            <p>Ad traffic: bounce rate <span class="negative">4.3% → 47.4%</span>, среднее время <span class="negative">111s → 46s</span>.</p>
+            <p><strong>Главный тревожный сигнал:</strong> Direct вырос по объёму, но сильно ухудшился по качеству. Это не похоже на “хороший рост бренда”. Похоже либо на смещение атрибуции, либо на менее целевой трафик, либо на сценарий, в котором пользователь заходит и уходит в мессенджер, не доходя до покупки на сайте.</p>
         </div>
 
-        <h2 id="pages">3. Слабые страницы</h2>
+        <h2 id="pages">3. Слабые страницы и точки потери</h2>
 
         <h3>3.1. Самые просевшие landing pages</h3>
         <div class="table-wrapper">
@@ -155,6 +218,7 @@
                         <th>Визиты P2</th>
                         <th>Δ</th>
                         <th>Δ %</th>
+                        <th>Вклад в loss</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -164,6 +228,7 @@
                         <td>5,124</td>
                         <td class="negative">-8,464</td>
                         <td class="negative">-62.3%</td>
+                        <td>19.9%</td>
                     </tr>
                     <tr>
                         <td><strong>/journal/article/voice</strong></td>
@@ -171,6 +236,7 @@
                         <td>13,514</td>
                         <td class="negative">-4,736</td>
                         <td class="negative">-26.0%</td>
+                        <td>11.1%</td>
                     </tr>
                     <tr>
                         <td>/5-principov-sistemy-stanislavskogo</td>
@@ -178,6 +244,7 @@
                         <td>1,470</td>
                         <td class="negative">-2,525</td>
                         <td class="negative">-63.2%</td>
+                        <td>5.9%</td>
                     </tr>
                     <tr>
                         <td>/akterskoe-masterstvo-rech</td>
@@ -185,6 +252,7 @@
                         <td>1,758</td>
                         <td class="negative">-1,762</td>
                         <td class="negative">-50.1%</td>
+                        <td>4.1%</td>
                     </tr>
                     <tr>
                         <td>/videovizitki</td>
@@ -192,6 +260,7 @@
                         <td>981</td>
                         <td class="negative">-1,610</td>
                         <td class="negative">-62.1%</td>
+                        <td>3.8%</td>
                     </tr>
                     <tr>
                         <td class="positive"><strong>msk/courses/acting/start</strong></td>
@@ -199,6 +268,7 @@
                         <td>2,774</td>
                         <td class="positive">+2,039</td>
                         <td class="positive">+277.4%</td>
+                        <td>-4.8%</td>
                     </tr>
                 </tbody>
             </table>
@@ -213,6 +283,7 @@
                         <th>Визиты P1</th>
                         <th>Визиты P2</th>
                         <th>Δ</th>
+                        <th>Вклад в SEO-loss</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -221,93 +292,173 @@
                         <td>12,585</td>
                         <td>4,418</td>
                         <td class="negative">-8,167</td>
+                        <td>16.1%</td>
                     </tr>
                     <tr>
                         <td><strong>/journal/article/voice</strong></td>
                         <td>15,931</td>
                         <td>11,055</td>
                         <td class="negative">-4,876</td>
+                        <td>9.6%</td>
                     </tr>
                     <tr>
                         <td><strong>/skorogovorki100</strong></td>
                         <td>23,379</td>
                         <td>20,661</td>
                         <td class="negative">-2,718</td>
+                        <td>5.4%</td>
                     </tr>
                     <tr>
                         <td>/5-principov-sistemy-stanislavskogo</td>
                         <td>3,744</td>
                         <td>1,314</td>
                         <td class="negative">-2,430</td>
+                        <td>4.8%</td>
                     </tr>
                     <tr>
                         <td>/videovizitki</td>
                         <td>2,494</td>
                         <td>875</td>
                         <td class="negative">-1,619</td>
+                        <td>3.2%</td>
                     </tr>
                     <tr>
                         <td class="positive">msk/courses/acting/start</td>
                         <td>450</td>
                         <td>1,045</td>
                         <td class="positive">+595</td>
+                        <td>-1.2%</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
         <div class="alert alert-warning">
-            <strong>Самая слабая страница:</strong> <code>/20uprazhneniy</code>. Она просела сразу по трём слоям: общий трафик, SEO-трафик и Telegram-лиды. Это крупнейшая точка потери, и её нужно проверять первой.
+            <strong>Главная точка потери:</strong> <code>/20uprazhneniy</code>. Страница потеряла и общий трафик, и SEO-трафик, и Telegram-лиды, и покупки. Это первый кандидат на ручной разбор контента, индексации, оффера и CTA.
         </div>
 
-        <h2 id="conversion">4. Что произошло с конверсиями</h2>
-
-        <h3>4.1. Покупки</h3>
+        <h3>3.3. Рост, который не стал заменой старому SEO</h3>
         <div class="table-wrapper">
             <table>
                 <thead>
                     <tr>
-                        <th>Показатель</th>
-                        <th>P1</th>
-                        <th>P2</th>
-                        <th>Δ</th>
+                        <th>Страница</th>
+                        <th>Источник роста</th>
+                        <th>Δ визитов</th>
+                        <th>Что это похоже</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Покупки</td>
-                        <td>122</td>
-                        <td>47</td>
-                        <td class="negative">-75 (-61.5%)</td>
+                        <td><strong>msk/courses/acting/start</strong></td>
+                        <td>Direct + SEO</td>
+                        <td class="positive">+2,039</td>
+                        <td>Рост интереса, но не рост монетизации</td>
                     </tr>
                     <tr>
-                        <td>Purchase CR</td>
-                        <td>0.0725%</td>
-                        <td>0.0382%</td>
-                        <td class="negative">-0.0343 п.п.</td>
+                        <td>/webinar/role-based-work-system</td>
+                        <td>Direct</td>
+                        <td class="positive">+389</td>
+                        <td>Новый верх воронки / сбор контактов</td>
                     </tr>
                     <tr>
-                        <td>Search engine purchases</td>
-                        <td>55</td>
-                        <td>23</td>
-                        <td class="negative">-32</td>
+                        <td>/free-guide-working-on-the-role-10-practical-exercises</td>
+                        <td>Direct / Telegram</td>
+                        <td class="positive">+257</td>
+                        <td>Лид-магнит, а не продажная страница</td>
                     </tr>
                     <tr>
-                        <td>Direct purchases</td>
-                        <td>32</td>
-                        <td>18</td>
-                        <td class="negative">-14</td>
+                        <td>/journal/tpost/gk01t0ai11-uznai-lzhetsa...</td>
+                        <td>Recommendation</td>
+                        <td class="positive">+143</td>
+                        <td>Контентный охват, вероятно из Дзена / рекомендаций</td>
                     </tr>
                     <tr>
-                        <td>Internal purchases</td>
-                        <td>23</td>
-                        <td>1</td>
-                        <td class="negative">-22</td>
+                        <td>/akterskie-vuzy-sankt-peterburga</td>
+                        <td>Recommendation</td>
+                        <td class="positive">+115</td>
+                        <td>Инфоспрос, не обязательно покупка</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
+        <div class="insight">
+            <div class="insight-title">Ключевая мысль</div>
+            <p>Новый рост есть, но он концентрируется вокруг контента, вебинаров, гайдов и отдельных московских страниц. Это хороший сигнал по спросу и охвату, но плохой заменитель старого SEO, если задача — вернуть выручку быстро.</p>
+        </div>
+
+        <h2 id="conversion">4. Конверсии: где именно бизнес потерял деньги</h2>
+
+        <h3>4.1. Покупки по источникам</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Источник</th>
+                        <th>Покупки P1</th>
+                        <th>Покупки P2</th>
+                        <th>Δ</th>
+                        <th>CR P1</th>
+                        <th>CR P2</th>
+                        <th>Δ CR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Search engine traffic</strong></td>
+                        <td>55</td>
+                        <td>23</td>
+                        <td class="negative">-32</td>
+                        <td>0.039%</td>
+                        <td>0.026%</td>
+                        <td class="negative">-0.0135 п.п.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Internal traffic</strong></td>
+                        <td>23</td>
+                        <td>1</td>
+                        <td class="negative">-22</td>
+                        <td>0.481%</td>
+                        <td>0.028%</td>
+                        <td class="negative">-0.4534 п.п.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Direct traffic</strong></td>
+                        <td>32</td>
+                        <td>18</td>
+                        <td class="negative">-14</td>
+                        <td>0.160%</td>
+                        <td>0.073%</td>
+                        <td class="negative">-0.0873 п.п.</td>
+                    </tr>
+                    <tr>
+                        <td>Link traffic</td>
+                        <td>6</td>
+                        <td>2</td>
+                        <td class="negative">-4</td>
+                        <td>0.469%</td>
+                        <td>0.072%</td>
+                        <td class="negative">-0.3964 п.п.</td>
+                    </tr>
+                    <tr>
+                        <td>Ad traffic</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td class="positive">+1</td>
+                        <td>0.000%</td>
+                        <td>0.067%</td>
+                        <td class="positive">+0.0675 п.п.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="highlight-box">
+            <p><strong>Главный коммерческий вывод:</strong> покупки просели и по объёму, и по CR. Это важнее, чем просто loss визитов: даже там, где трафик вырос, он не всегда превращается в оплату.</p>
+        </div>
+
+        <h3>4.2. Самые просевшие страницы по покупкам</h3>
         <div class="table-wrapper">
             <table>
                 <thead>
@@ -316,7 +467,7 @@
                         <th>Покупки P1</th>
                         <th>Покупки P2</th>
                         <th>Δ</th>
-                        <th>Комментарий</th>
+                        <th>Что важно</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -339,27 +490,27 @@
                         <td>8</td>
                         <td>1</td>
                         <td class="negative">-7</td>
-                        <td>CR резко просел</td>
+                        <td>Трафик почти сохранился, продажа нет</td>
                     </tr>
                     <tr>
                         <td>/journal/article/voice</td>
                         <td>12</td>
                         <td>6</td>
                         <td class="negative">-6</td>
-                        <td>И трафик, и монетизация ниже</td>
+                        <td>Loss одновременно в трафике и покупке</td>
                     </tr>
                     <tr>
                         <td>msk/courses/acting/start</td>
                         <td>3</td>
                         <td>0</td>
                         <td class="negative">-3</td>
-                        <td>Трафик вырос, покупка исчезла</td>
+                        <td>Трафик вырос, а покупка пропала</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <h3>4.2. Telegram и WhatsApp</h3>
+        <h3>4.3. Telegram и WhatsApp</h3>
         <div class="table-wrapper">
             <table>
                 <thead>
@@ -368,113 +519,230 @@
                         <th>P1</th>
                         <th>P2</th>
                         <th>Δ</th>
-                        <th>CR</th>
+                        <th>CR P1</th>
+                        <th>CR P2</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><strong>Telegram</strong></td>
+                        <td><strong>Telegram, всего</strong></td>
                         <td>6,250</td>
                         <td>5,939</td>
                         <td class="negative">-311 (-5.0%)</td>
-                        <td class="positive">3.72% → 4.83%</td>
+                        <td>3.72%</td>
+                        <td class="positive">4.83%</td>
                     </tr>
                     <tr>
                         <td>Telegram из поиска</td>
                         <td>4,909</td>
                         <td>3,529</td>
                         <td class="negative">-1,380</td>
-                        <td class="positive">3.52% → 3.97%</td>
+                        <td>3.52%</td>
+                        <td class="positive">3.97%</td>
                     </tr>
                     <tr>
                         <td>Telegram из Direct</td>
                         <td>850</td>
                         <td>1,550</td>
                         <td class="positive">+700</td>
-                        <td class="positive">4.26% → 6.29%</td>
+                        <td>4.26%</td>
+                        <td class="positive">6.29%</td>
                     </tr>
                     <tr>
                         <td>Telegram из Recommendation</td>
                         <td>0</td>
                         <td>153</td>
                         <td class="positive">+153</td>
-                        <td class="positive">0% → 10.76%</td>
+                        <td>0%</td>
+                        <td class="positive">10.76%</td>
                     </tr>
                     <tr>
                         <td><strong>WhatsApp</strong></td>
                         <td>7</td>
                         <td>0</td>
                         <td class="negative">-7 (-100%)</td>
-                        <td class="negative">0.0042% → 0%</td>
+                        <td>0.0042%</td>
+                        <td class="negative">0%</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
         <div class="insight">
-            <div class="insight-title">Главный перекос воронки</div>
-            <p>Telegram держится значительно лучше, чем покупки. Это значит, что верх воронки не развалился полностью, но люди чаще уходят в контактный сценарий и реже доходят до оплаты. Самый наглядный пример — <code>msk/courses/acting/start</code>: трафик <span class="positive">+2,039</span>, Telegram <span class="positive">23 → 73</span>, покупки <span class="negative">3 → 0</span>.</p>
+            <div class="insight-title">Воронка изменилась</div>
+            <p>Telegram держится лучше, чем покупки. Это значит, что верх воронки не развалился полностью, но значимая часть спроса теперь чаще уходит в контактный сценарий, а не в покупку на сайте. Самый яркий пример — <code>msk/courses/acting/start</code>: трафик вырос, Telegram вырос, покупка исчезла.</p>
         </div>
 
-        <h3>4.3. Почему Direct сейчас подозрителен</h3>
-        <div class="highlight-box">
-            <p><strong>Direct вырос не как здоровый brand traffic.</strong></p>
-            <p>Он принёс больше визитов и больше Telegram-переходов, но при этом bounce rate вырос почти в 3 раза, а purchase CR упал больше чем вдвое.</p>
-            <p>Похоже либо на менее целевой трафик, либо на смещение атрибуции, либо на сценарий, в котором пользователь заходит, кликает в мессенджер, но не завершает покупку на сайте.</p>
+        <h3>4.4. Страницы, где Telegram жив, а покупка умерла</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Страница</th>
+                        <th>Δ трафика</th>
+                        <th>Δ Telegram</th>
+                        <th>Δ покупок</th>
+                        <th>Интерпретация</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>msk/courses/acting/start</strong></td>
+                        <td class="positive">+2,039</td>
+                        <td class="positive">+50</td>
+                        <td class="negative">-3</td>
+                        <td>Внимание есть, деньги не доходят</td>
+                    </tr>
+                    <tr>
+                        <td><strong>/trial-lesson</strong></td>
+                        <td class="negative">-303</td>
+                        <td class="positive">+15</td>
+                        <td class="negative">-10</td>
+                        <td>Смещение из покупки в мессенджер</td>
+                    </tr>
+                    <tr>
+                        <td><strong>msk/</strong></td>
+                        <td class="negative">-218</td>
+                        <td class="positive">+267</td>
+                        <td class="negative">-7</td>
+                        <td>Контакт растёт, монетизация падает</td>
+                    </tr>
+                    <tr>
+                        <td><strong>/20uprazhneniy</strong></td>
+                        <td class="negative">-8,464</td>
+                        <td class="negative">-315</td>
+                        <td class="negative">-2</td>
+                        <td>Здесь ломается всё сразу</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-        <h2 id="hypotheses">5. Что подтверждается данными</h2>
+        <h2 id="drivers">5. Главные драйверы и антидрайверы</h2>
 
-        <div class="alert alert-success">
-            <strong>Подтверждается:</strong> Part Academy потерял значимую часть поискового спроса на ключевых контентных и коммерческих страницах. Это основная причина общего снижения.
+        <h3>5.1. Что больше всего тянет вниз</h3>
+        <div class="alert alert-danger">
+            <strong>Драйвер №1:</strong> Search engine traffic. Он дал больше 100% вклада в общий минус, потому что рост других источников лишь частично замаскировал его падение.
+        </div>
+        <div class="alert alert-danger">
+            <strong>Драйвер №2:</strong> loss на evergreen-страницах. Самые большие потери — <code>/20uprazhneniy</code>, <code>/journal/article/voice</code>, <code>/skorogovorki100</code>, <code>/5-principov-sistemy-stanislavskogo</code>.
+        </div>
+        <div class="alert alert-danger">
+            <strong>Драйвер №3:</strong> коммерческий провал на purchase-страницах. Самые критичные кейсы: <code>/trial-lesson</code>, <code>msk/trial-lesson</code>, <code>msk/</code>, <code>msk/courses/acting/start</code>.
         </div>
 
-        <div class="alert alert-success">
-            <strong>Подтверждается:</strong> коммерческая эффективность трафика просела сильнее самого трафика. Это видно по покупкам, purchase CR и страницам с выросшими Telegram-лидами, но исчезнувшими покупками.
-        </div>
-
+        <h3>5.2. Что выросло, но не решило проблему</h3>
         <div class="alert alert-info">
-            <strong>Частично подтверждается:</strong> часть нового роста пришла из recommendation и direct на журнал, вебинары и отдельные московские страницы. Это выглядит как рост awareness и интереса к верхней части воронки, но не как прямой рост выручки.
+            <strong>Direct traffic:</strong> вырос, но стал хуже по качеству и не вернул покупки.
+        </div>
+        <div class="alert alert-info">
+            <strong>Recommendation system traffic:</strong> появился почти с нуля, но идёт в основном на статьи и верх воронки.
+        </div>
+        <div class="alert alert-info">
+            <strong>Telegram:</strong> держится заметно лучше покупок, но это не эквивалент возврата revenue.
         </div>
 
-        <div class="alert alert-warning">
-            <strong>Требует ручной проверки:</strong> purchase-путь на <code>/trial-lesson</code>, <code>msk/trial-lesson</code> и <code>msk/courses/acting/start</code>. Там видно расхождение между интересом пользователя и деньгами. Нужно проверить реальный UX-путь, оффер, кнопку оплаты, события Метрики и возможный перевод пользователя в мессенджеры.
+        <h2 id="hypotheses">6. Рабочие гипотезы</h2>
+
+        <div class="insight">
+            <h3>H1. SEO-просадка на ключевых evergreen-страницах</h3>
+            <p><strong>Статус:</strong> подтверждается</p>
+            <p><strong>Уверенность:</strong> high</p>
+            <p><strong>Почему:</strong> крупнейшие потери по search traffic сосредоточены на небольшом наборе сильных страниц, а их вклад в минус слишком велик, чтобы считать это случайным шумом.</p>
+            <p><strong>Что делать:</strong> разбирать контент, внутреннюю перелинковку, техническое состояние, сниппеты и историю изменений этих страниц.</p>
         </div>
 
-        <h2 id="limits">6. Что было недоступно</h2>
+        <div class="insight">
+            <h3>H2. Бизнес сместился в более верхневороночную модель</h3>
+            <p><strong>Статус:</strong> подтверждается</p>
+            <p><strong>Уверенность:</strong> high</p>
+            <p><strong>Почему:</strong> Telegram удержался, recommendation вырос, direct вырос, а покупки просели намного сильнее. Это типичный сигнал сдвига от коммерческого намерения к информационному и контактному.</p>
+            <p><strong>Что делать:</strong> отделить контентный трафик от продажного и перестроить путь от вебинара / гайда / статьи к следующему коммерческому шагу.</p>
+        </div>
+
+        <div class="insight">
+            <h3>H3. Часть коммерческих страниц теперь лучше уводит в мессенджер, чем в оплату</h3>
+            <p><strong>Статус:</strong> подтверждается частично</p>
+            <p><strong>Уверенность:</strong> high</p>
+            <p><strong>Почему:</strong> на <code>/trial-lesson</code>, <code>msk/</code> и <code>msk/courses/acting/start</code> видно расхождение между контактной активностью и покупкой.</p>
+            <p><strong>Что делать:</strong> проверить фактический UX-путь пользователя, оффер, CTA-блоки и то, как мессенджер встраивается в покупочный сценарий.</p>
+        </div>
+
+        <div class="insight">
+            <h3>H4. Direct сейчас загрязнён или переатрибутирован</h3>
+            <p><strong>Статус:</strong> подтверждается частично</p>
+            <p><strong>Уверенность:</strong> medium</p>
+            <p><strong>Почему:</strong> direct растёт по объёму, но резко портится по bounce rate и purchase CR. Для “чистого брендового” трафика это выглядит странно.</p>
+            <p><strong>Что делать:</strong> проверить разметку каналов, UTM, мессенджерные переходы, внутренние переходы и все источники, которые могут попадать в direct по умолчанию.</p>
+        </div>
+
+        <div class="insight">
+            <h3>H5. Есть отдельная проблема на московских коммерческих страницах</h3>
+            <p><strong>Статус:</strong> подтверждается частично</p>
+            <p><strong>Уверенность:</strong> medium-high</p>
+            <p><strong>Почему:</strong> московские страницы показывают смешанную картину: по части из них растёт трафик и Telegram, но покупка падает до нуля. Это уже локальная аномалия в рамках общей тенденции.</p>
+            <p><strong>Что делать:</strong> отдельный ручной аудит блока МСК: путь от входа до оплаты, CTA, видимость формы, мобильная версия, корректность целей и возможные различия между СПБ и МСК шаблонами.</p>
+        </div>
+
+        <h2 id="actions">7. Что делать: конкретный план</h2>
+
+        <h3>7.1. Приоритет 1: быстрое расследование revenue-loss</h3>
+        <ul class="checklist">
+            <li>Разобрать <strong>/trial-lesson</strong>, <strong>msk/trial-lesson</strong>, <strong>msk/</strong>, <strong>msk/courses/acting/start</strong> вручную: где пользователь нажимает, куда уходит, где теряется покупка.</li>
+            <li>Сравнить фактический пользовательский путь “покупка” против “Telegram” на этих страницах: какой CTA первичен, что видно выше первого экрана, куда ведут кнопки.</li>
+            <li>Проверить, не сломана ли сама фиксация покупки и нет ли части продаж, которые уходят мимо цели 3041010869.</li>
+        </ul>
+
+        <h3>7.2. Приоритет 2: восстановление SEO-ядра</h3>
+        <ul class="checklist">
+            <li>В первую очередь проверить <strong>/20uprazhneniy</strong>, затем <strong>/journal/article/voice</strong>, <strong>/skorogovorki100</strong>, <strong>/5-principov-sistemy-stanislavskogo</strong>.</li>
+            <li>Для каждой из этих страниц проверить: изменение контента, title / description, перелинковку, каноникал, редиректы, индексацию, шаблонные изменения и видимость CTA.</li>
+            <li>Не пытаться сразу “чинить весь сайт”: сначала вернуть 5-10 крупнейших источников SEO-loss.</li>
+        </ul>
+
+        <h3>7.3. Приоритет 3: развести верх воронки и revenue</h3>
+        <ul class="checklist">
+            <li>Отдельно считать контентные страницы и лид-магниты, отдельно — реальные коммерческие страницы. Сейчас они смешиваются и создают ложное ощущение, что growth уже компенсирует падение.</li>
+            <li>Для webinar / guide / recommendation трафика добавить более понятный следующий шаг к продаже: не только Telegram, но и более жёсткий сценарий перехода в продуктовый оффер.</li>
+            <li>Если Telegram — осознанный основной путь, нужна вторая линия аналитики: что происходит после ухода в Telegram и как это кончается оплатой.</li>
+        </ul>
+
+        <h3>7.4. Приоритет 4: починить слой доказательств</h3>
+        <ul class="checklist">
+            <li>Починить доступы к <strong>GSC</strong> и <strong>Яндекс.Вебмастеру</strong>, иначе невозможно уверенно разделить loss на позиции, CTR и индексацию.</li>
+            <li>Разобраться с “грязным” <strong>Direct</strong>: UTM, мессенджеры, recommendation, возможная потеря referrer и любые каналы, которые Метрика перекладывает в direct.</li>
+            <li>Проверить нулевые или пустые цели типа “все формы / Timepad / заявки с тестов” и либо оживить их, либо перестать использовать как KPI.</li>
+        </ul>
+
+        <h2 id="limits">8. Ограничения анализа</h2>
 
         <div class="alert alert-warning">
-            <strong>GSC не отработал:</strong> токен вернул <code>invalid_grant</code>.
+            <strong>Google Search Console не отработал:</strong> токен вернул <code>invalid_grant</code>. Поэтому в текущем отчёте нет свежего слоя по clicks / impressions / CTR / positions.
         </div>
 
         <div class="alert alert-warning">
             <strong>Яндекс.Вебмастер не отработал:</strong> по запросам был <code>METHOD_NOT_ALLOWED</code>, по индексации — <code>RESOURCE_NOT_FOUND</code>.
         </div>
 
-        <p>Поэтому SEO-проблема подтверждена по Метрике очень уверенно, но по этому запуску нельзя честно разделить loss на падение позиций, CTR или индексацию. Для этого нужно починить доступы к GSC и Яндекс.Вебмастеру.</p>
+        <div class="highlight-box">
+            <p>Из-за этого нельзя честно утверждать, что причина уже локализована до уровня “просели именно позиции” или “просел именно CTR”. По Метрике проблема SEO очевидна, но механизм потери в поиске пока подтверждён только косвенно.</p>
+        </div>
 
-        <h2 id="actions">7. Что делать дальше</h2>
-
-        <ul class="checklist">
-            <li>Проверить в первую очередь <strong>/20uprazhneniy</strong>: контент, индексацию, внутренние ссылки, сниппеты, редиректы, CTA и актуальность оффера.</li>
-            <li>Проверить purchase-путь на <strong>/trial-lesson</strong>, <strong>msk/trial-lesson</strong> и <strong>msk/courses/acting/start</strong>: форма, кнопка оплаты, шаги после Telegram, корректность цели покупки.</li>
-            <li>Разобрать, что именно попадает в <strong>Direct traffic</strong>: откуда растёт трафик, есть ли неразмеченные кампании или мессенджерные переходы без UTM.</li>
-            <li>Отдельно оценить новый слой <strong>Recommendation system traffic</strong>: какие материалы дают максимум Telegram-лидов и можно ли увести их в более коммерческий путь.</li>
-            <li>Починить доступы к <strong>GSC</strong> и <strong>Яндекс.Вебмастеру</strong>, чтобы подтвердить механическую причину SEO-падения на уровне запросов, CTR и позиций.</li>
-        </ul>
-
-        <h2>8. Evidence</h2>
+        <h2 id="evidence">9. Evidence paths</h2>
 
         <div class="highlight-box">
             <p><strong>Основные workbook-файлы:</strong></p>
             <p><code>data_cache/partacademy/analysis_sources_2025010120250319__2026010120260319.json</code></p>
             <p><code>data_cache/partacademy/analysis_pages_2025010120250319__2026010120260319.json</code></p>
             <p><code>data_cache/partacademy/analysis_pages_by_source_search_engine_traffic_2025010120250319__2026010120260319.json</code></p>
+            <p><code>data_cache/partacademy/analysis_pages_by_source_direct_traffic_2025010120250319__2026010120260319.json</code></p>
+            <p><code>data_cache/partacademy/analysis_pages_by_source_recommendation_system_traffic_2025010120250319__2026010120260319.json</code></p>
             <p><code>data_cache/partacademy/analysis_goals_by_source_3041010869_2025010120250319__2026010120260319.json</code></p>
             <p><code>data_cache/partacademy/analysis_goals_by_page_3041010869_2025010120250319__2026010120260319.json</code></p>
             <p><code>data_cache/partacademy/analysis_goals_by_source_293084879_2025010120250319__2026010120260319.json</code></p>
             <p><code>data_cache/partacademy/analysis_goals_by_page_293084879_2025010120250319__2026010120260319.json</code></p>
             <p><code>data_cache/partacademy/analysis_goals_by_source_293085189_2025010120250319__2026010120260319.json</code></p>
+            <p><code>data_cache/partacademy/analysis_goals_by_page_293085189_2025010120250319__2026010120260319.json</code></p>
             <p><code>reports/partacademy/20260320-140848/report.md</code></p>
             <p><code>reports/partacademy/20260320-140848/report.html</code></p>
         </div>
