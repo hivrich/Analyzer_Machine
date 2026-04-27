@@ -10,7 +10,7 @@ from app.gsc_client import GSCClient, normalize_gsc_rows
 
 def load_or_fetch_gsc(
     client: str,
-    kind: str,  # "queries" | "pages"
+    kind: str,  # "queries" | "pages" | "query_page"
     date1: str,
     date2: str,
     limit: int,
@@ -23,10 +23,15 @@ def load_or_fetch_gsc(
     Returns:
       (normalized_rows, dimensions)
     """
-    if kind not in {"queries", "pages"}:
-        raise ValueError("kind must be 'queries' or 'pages'")
+    dimensions_by_kind = {
+        "queries": ["query"],
+        "pages": ["page"],
+        "query_page": ["query", "page"],
+    }
+    if kind not in dimensions_by_kind:
+        raise ValueError("kind must be 'queries', 'pages' or 'query_page'")
 
-    dimensions = ["query"] if kind == "queries" else ["page"]
+    dimensions = dimensions_by_kind[kind]
 
     cache_dir = Path("data_cache") / client
     cache_dir.mkdir(parents=True, exist_ok=True)
@@ -178,4 +183,3 @@ def workbook_filename(kind: str, p1_start: str, p1_end: str, p2_start: str, p2_e
         f"{p1_start.replace('-', '')}{p1_end.replace('-', '')}"
         f"__{p2_start.replace('-', '')}{p2_end.replace('-', '')}.json"
     )
-

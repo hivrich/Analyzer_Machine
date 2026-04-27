@@ -642,6 +642,59 @@ def gsc_pages_cmd(
     rprint(table)
 
 
+@app.command("gsc-query-page")
+def gsc_query_page_cmd(
+    client: str = typer.Argument(..., help="Имя папки в clients/<client>/"),
+    date1: str = typer.Argument(..., help="Начальная дата (YYYY-MM-DD)"),
+    date2: str = typer.Argument(..., help="Конечная дата (YYYY-MM-DD)"),
+    limit: int = typer.Option(1000, "--limit", help="Лимит строк (rowLimit)"),
+    refresh: bool = typer.Option(False, "--refresh", help="Принудительно перезапросить GSC"),
+):
+    """Получить данные GSC по связке query x page за период и сохранить в data_cache."""
+    cfg, _ = load_client_config(client)
+    try:
+        gsc = _get_gsc_client(cfg)
+    except Exception as e:
+        rprint(f"[bold red]Error:[/bold red] {e}")
+        raise typer.Exit(code=1)
+
+    try:
+        norm, _dims = load_or_fetch_gsc(
+            client=client,
+            kind="query_page",
+            date1=date1,
+            date2=date2,
+            limit=limit,
+            refresh=refresh,
+            gsc_client=gsc,
+        )
+    except Exception as e:
+        msg = str(e)
+        for secret in [gsc.client_id, gsc.client_secret, gsc.refresh_token]:
+            if secret and secret in msg:
+                msg = msg.replace(secret, "***")
+        rprint(f"[bold red]Error:[/bold red] GSC error: {msg[:500]}")
+        raise typer.Exit(code=1)
+
+    table = Table(title=f"GSC query x page ({client}, {cfg.gsc_site_url}, {date1} - {date2})")
+    table.add_column("query")
+    table.add_column("page")
+    table.add_column("clicks", justify="right")
+    table.add_column("impr", justify="right")
+    table.add_column("ctr_%", justify="right")
+    table.add_column("pos", justify="right")
+    for row in norm[:limit] if limit > 0 else norm:
+        table.add_row(
+            str(row.get("query", "")),
+            str(row.get("page", "")),
+            str(int(row.get("clicks", 0.0) or 0.0)),
+            str(int(row.get("impressions", 0.0) or 0.0)),
+            f"{float(row.get('ctr', 0.0) or 0.0):.2f}",
+            f"{float(row.get('position', 0.0) or 0.0):.2f}",
+        )
+    rprint(table)
+
+
 @app.command("analyze-gsc-queries")
 def analyze_gsc_queries_cmd(
     client: str = typer.Argument(..., help="Имя папки в clients/<client>/"),

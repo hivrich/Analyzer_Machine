@@ -298,9 +298,9 @@ capabilities:
     : \u043A\u0430\u043A\u0438\u0435 \u0437\u0430\u043F\u0440\u043E\u0441\u044B \u043F\
     \u0440\u0438\u0432\u043E\u0434\u044F\u0442 \u043D\u0430 \u043A\u0430\u043A\u0438\
     \u0435 \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u044B (Google)"
-  status: planned_tier2
+  status: implemented
   tier: 2
-  command_template: TBD (planned; no CLI command yet)
+  command_template: python -m app.cli gsc-query-page {client} {date1} {date2} --limit {limit}
   artifacts:
   - data_cache/{client}/gsc_query_page_raw_{p1_start}_{p1_end}.json
   - data_cache/{client}/gsc_query_page_norm_{p1_start}_{p1_end}.json
