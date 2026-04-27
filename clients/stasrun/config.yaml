@@ -1,0 +1,19 @@
+site:
+  name: "stas.run"
+  timezone: "Europe/Moscow"
+
+metrika:
+  counter_id: 100635480
+  goal_id: 549619513
+  currency: "RUB"
+
+reporting:
+  llm_enabled: true
+  language: "ru"
+
+gsc:
+  site_url: "https://stas.run/"
+
+ym_webmaster:
+  user_id: "44806260"
+  host_id: "https:stas.run:443"
