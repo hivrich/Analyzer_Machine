@@ -130,6 +130,7 @@ python -m pytest tests -v
 - `python -m app.cli gsc-queries <client> <date1> <date2> [--limit N] [--refresh]`
 - `python -m app.cli gsc-pages <client> <date1> <date2> [--limit N] [--refresh]`
 - `python -m app.cli gsc-query-page <client> <date1> <date2> [--limit N] [--refresh]`
+- `python -m app.cli en-seo-weekly-report <client> <date1> <date2> [--goal-id <id>] [--limit N] [--refresh]`
 - `python -m app.cli analyze-gsc-queries <client> <p1_start> <p1_end> <p2_start> <p2_end> [--limit N] [--refresh] [--format table|insights]`
 - `python -m app.cli analyze-gsc-pages <client> <p1_start> <p1_end> <p2_start> <p2_end> [--limit N] [--refresh] [--format table|insights]`
 

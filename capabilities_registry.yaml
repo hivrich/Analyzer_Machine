@@ -320,6 +320,27 @@ capabilities:
     \u0435\u043D\u044C \u0434\u0435\u0442\u0430\u043B\u044C\u043D\u0430\u044F \u0438\
     \u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044F, \u0438\u0441\u043F\u043E\
     \u043B\u044C\u0437\u0443\u0435\u0442\u0441\u044F \u0434\u043B\u044F deep dive\n"
+- id: C5.4
+  name: EN SEO Weekly Report
+  description: "Еженедельный отчёт для EN SEO: GSC по /en страницам + signup_success по источникам и EN organic signups"
+  status: implemented
+  tier: 2
+  command_template: python -m app.cli en-seo-weekly-report {client} {date1} {date2} --goal-id {goal_id} --limit {limit}
+  artifacts:
+  - data_cache/{client}/en_seo_weekly_report_{date1}_{date2}.json
+  checks_hypotheses:
+  - H2.1
+  - H5.1
+  checks_signals:
+  - S2
+  - S5
+  priority: 8
+  depends_on:
+  - C5.2
+  - C5.3
+  - C2
+  data_source: google_search_console+yandex_metrika
+  implementation_notes: "- GSC totals считаются только по URL /en\n- Top queries считаются через query x page и фильтр /en\n- EN organic signups считаются по source x landingPage: source=organic/search и landingPage=/en\n"
 - id: C4
   name: Ecommerce by Source
   description: "\u0410\u043D\u0430\u043B\u0438\u0437 \u0442\u0440\u0430\u043D\u0437\

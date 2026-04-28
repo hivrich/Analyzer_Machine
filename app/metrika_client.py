@@ -197,6 +197,39 @@ class MetrikaClient:
         }
         return self._get(url, params)
 
+    def goals_by_source_page(
+        self,
+        date1: str,
+        date2: str,
+        goal_id: int,
+        limit: int = 5000,
+    ) -> Dict[str, Any]:
+        """
+        Конверсии по цели (goal_id) в разрезе источник x входная страница.
+
+        Нужно для EN SEO: считаем signup_success, где источник = search,
+        а входная страница относится к /en.
+        """
+        if goal_id <= 0:
+            raise ValueError("goal_id must be > 0")
+
+        url = "https://api-metrika.yandex.net/stat/v1/data"
+        params = {
+            "ids": str(self.counter_id),
+            "dimensions": "ym:s:lastTrafficSource,ym:s:startURL",
+            "metrics": (
+                f"ym:s:visits,"
+                f"ym:s:goal{goal_id}visits,"
+                f"ym:s:goal{goal_id}conversionRate"
+            ),
+            "date1": date1,
+            "date2": date2,
+            "accuracy": "full",
+            "sort": f"-ym:s:goal{goal_id}visits",
+            "limit": str(limit),
+        }
+        return self._get(url, params)
+
     def list_goals(self) -> Dict[str, Any]:
         """
         Список целей счётчика (Management API).
@@ -316,6 +349,42 @@ def normalize_goals_by_page(resp: Dict[str, Any]) -> List[Dict[str, Any]]:
         out.append(
             {
                 "landingPage": url or "(unknown)",
+                "visits": visits,
+                "goal_visits": goal_visits,
+                "goal_cr_pct": goal_cr,
+            }
+        )
+    return out
+
+
+def normalize_goals_by_source_page(resp: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """
+    Нормализация ответа goals_by_source_page():
+    - source
+    - landingPage
+    - visits
+    - goal_visits
+    - goal_cr_pct
+    """
+    out: List[Dict[str, Any]] = []
+    data = resp.get("data") or []
+    for row in data:
+        dims = row.get("dimensions") or []
+        source = ""
+        landing_page = ""
+        if isinstance(dims, list):
+            if len(dims) > 0 and isinstance(dims[0], dict):
+                source = str(dims[0].get("name", "")).strip()
+            if len(dims) > 1 and isinstance(dims[1], dict):
+                landing_page = str(dims[1].get("name", "")).strip()
+        metrics = row.get("metrics") or []
+        visits = float(metrics[0]) if len(metrics) > 0 else 0.0
+        goal_visits = float(metrics[1]) if len(metrics) > 1 else 0.0
+        goal_cr = float(metrics[2]) if len(metrics) > 2 else 0.0
+        out.append(
+            {
+                "source": source or "(unknown)",
+                "landingPage": landing_page or "(unknown)",
                 "visits": visits,
                 "goal_visits": goal_visits,
                 "goal_cr_pct": goal_cr,

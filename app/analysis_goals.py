@@ -9,6 +9,7 @@ from app.metrika_client import (
     MetrikaClient,
     normalize_goals_by_page,
     normalize_goals_by_source,
+    normalize_goals_by_source_page,
 )
 
 
@@ -82,6 +83,39 @@ def load_or_fetch_goals_by_page(
 
     raw_data = metrika_client.goals_by_page(date1, date2, goal_id, fetch_limit)
     normalized_data = normalize_goals_by_page(raw_data)
+
+    raw_file.write_text(json.dumps(raw_data, ensure_ascii=False, indent=2), encoding="utf-8")
+    norm_file.write_text(json.dumps(normalized_data, ensure_ascii=False, indent=2), encoding="utf-8")
+    return normalized_data
+
+
+def load_or_fetch_goals_by_source_page(
+    client: str,
+    date1: str,
+    date2: str,
+    goal_id: int,
+    limit: int,
+    refresh: bool,
+    metrika_client: MetrikaClient,
+) -> List[Dict[str, Any]]:
+    cache_dir = Path("data_cache") / client
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    raw_file = cache_dir / f"metrika_goals_by_source_page_raw_{goal_id}_{date1}_{date2}.json"
+    norm_file = cache_dir / f"metrika_goals_by_source_page_norm_{goal_id}_{date1}_{date2}.json"
+
+    fetch_limit = max(5000, int(limit) if limit and limit > 0 else 0)
+
+    if not refresh and norm_file.exists():
+        try:
+            cached = json.loads(norm_file.read_text(encoding="utf-8"))
+            if isinstance(cached, list) and len(cached) >= max(1, min(fetch_limit, 50)):
+                return cached
+        except Exception:
+            pass
+
+    raw_data = metrika_client.goals_by_source_page(date1, date2, goal_id, fetch_limit)
+    normalized_data = normalize_goals_by_source_page(raw_data)
 
     raw_file.write_text(json.dumps(raw_data, ensure_ascii=False, indent=2), encoding="utf-8")
     norm_file.write_text(json.dumps(normalized_data, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -225,4 +259,3 @@ def workbook_filename(
         f"{p1_start.replace('-', '')}{p1_end.replace('-', '')}"
         f"__{p2_start.replace('-', '')}{p2_end.replace('-', '')}.json"
     )
-

@@ -176,6 +176,7 @@ python -m app.cli analyze-goals-by-page <client> <p1_start> <p1_end> <p2_start> 
 python -m app.cli analyze-gsc-queries <client> <p1_start> <p1_end> <p2_start> <p2_end> [--limit N] [--refresh]
 python -m app.cli analyze-gsc-pages <client> <p1_start> <p1_end> <p2_start> <p2_end> [--limit N] [--refresh]
 python -m app.cli gsc-query-page <client> <date1> <date2> [--limit N] [--refresh]
+python -m app.cli en-seo-weekly-report <client> <date1> <date2> [--goal-id <goal_id>] [--limit N] [--refresh]
 ```
 
 Полный список команд: `python -m app.cli --help`

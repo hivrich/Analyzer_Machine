@@ -24,9 +24,11 @@ from app.analysis_goals import (
     create_workbook as create_workbook_goals,
     load_or_fetch_goals_by_page,
     load_or_fetch_goals_by_source,
+    load_or_fetch_goals_by_source_page,
     sort_rows as sort_goals_rows,
     workbook_filename as goals_workbook_filename,
 )
+from app.en_seo_report import create_en_seo_weekly_report, save_report
 from app.analysis_pages import (
     calculate_contributions as calculate_contributions_pages,
     compare_pages_periods,
@@ -693,6 +695,169 @@ def gsc_query_page_cmd(
             f"{float(row.get('position', 0.0) or 0.0):.2f}",
         )
     rprint(table)
+
+
+@app.command("en-seo-weekly-report")
+def en_seo_weekly_report_cmd(
+    client: str = typer.Argument(..., help="Имя папки в clients/<client>/"),
+    date1: str = typer.Argument(..., help="Начальная дата (YYYY-MM-DD)"),
+    date2: str = typer.Argument(..., help="Конечная дата (YYYY-MM-DD)"),
+    goal_id: int = typer.Option(0, "--goal-id", help="ID цели Метрики (0 = взять из config)"),
+    limit: int = typer.Option(10, "--limit", help="Лимит строк в блоках top queries/top pages/sources"),
+    refresh: bool = typer.Option(False, "--refresh", help="Принудительно перезапросить GSC и Метрику"),
+):
+    """Еженедельный EN SEO отчёт: GSC + signup_success из Метрики."""
+    try:
+        cfg, _ = load_client_config(client)
+    except Exception as e:
+        rprint(f"[bold red]Error:[/bold red] Не удалось загрузить конфиг: {e}")
+        raise typer.Exit(code=1)
+
+    if cfg.counter_id <= 0:
+        rprint("[bold red]Error:[/bold red] metrika.counter_id не задан в config.yaml")
+        raise typer.Exit(code=1)
+
+    resolved_goal_id = int(goal_id or 0) or int(cfg.goal_id or 0)
+    if resolved_goal_id <= 0:
+        rprint("[bold red]Error:[/bold red] goal_id не задан. Укажите --goal-id или metrika.goal_id в config.yaml")
+        raise typer.Exit(code=1)
+
+    token = os.getenv("YANDEX_METRIKA_TOKEN")
+    if not token:
+        rprint("[bold red]Error:[/bold red] YANDEX_METRIKA_TOKEN не задан в окружении")
+        raise typer.Exit(code=1)
+
+    try:
+        gsc = _get_gsc_client(cfg)
+    except Exception as e:
+        rprint(f"[bold red]Error:[/bold red] {e}")
+        raise typer.Exit(code=1)
+
+    metrika = MetrikaClient(token=token, counter_id=cfg.counter_id)
+
+    try:
+        gsc_pages, _ = load_or_fetch_gsc(
+            client=client,
+            kind="pages",
+            date1=date1,
+            date2=date2,
+            limit=5000,
+            refresh=refresh,
+            gsc_client=gsc,
+        )
+        gsc_query_page, _ = load_or_fetch_gsc(
+            client=client,
+            kind="query_page",
+            date1=date1,
+            date2=date2,
+            limit=5000,
+            refresh=refresh,
+            gsc_client=gsc,
+        )
+        goals_by_source = load_or_fetch_goals_by_source(
+            client=client,
+            date1=date1,
+            date2=date2,
+            goal_id=resolved_goal_id,
+            limit=limit,
+            refresh=refresh,
+            metrika_client=metrika,
+        )
+        goals_by_source_page = load_or_fetch_goals_by_source_page(
+            client=client,
+            date1=date1,
+            date2=date2,
+            goal_id=resolved_goal_id,
+            limit=5000,
+            refresh=refresh,
+            metrika_client=metrika,
+        )
+    except RuntimeError as e:
+        error_msg = str(e)
+        for secret in [token, getattr(gsc, "client_id", ""), getattr(gsc, "client_secret", ""), getattr(gsc, "refresh_token", "")]:
+            if secret and secret in error_msg:
+                error_msg = error_msg.replace(secret, "***")
+        if "OAuth" in error_msg:
+            error_msg = error_msg.split("OAuth")[0] + "OAuth ***"
+        rprint(f"[bold red]Error:[/bold red] API error: {error_msg[:500]}")
+        raise typer.Exit(code=1)
+    except Exception as e:
+        rprint(f"[bold red]Error:[/bold red] Не удалось собрать отчёт: {e}")
+        raise typer.Exit(code=1)
+
+    report = create_en_seo_weekly_report(
+        client=client,
+        site_url=cfg.gsc_site_url,
+        counter_id=cfg.counter_id,
+        goal_id=resolved_goal_id,
+        date1=date1,
+        date2=date2,
+        gsc_pages=gsc_pages,
+        gsc_query_page=gsc_query_page,
+        goals_by_source=goals_by_source,
+        goals_by_source_page=goals_by_source_page,
+        limit=limit,
+        refresh_used=refresh,
+    )
+    report_file = save_report(client, report, date1, date2)
+    rprint(f"[green]EN SEO report сохранён:[/green] {report_file.name}")
+
+    gsc_summary = report["gsc_en"]
+    rprint("\n[bold]GSC EN:[/bold]")
+    rprint(f"  clicks: {int(gsc_summary['clicks']):,}")
+    rprint(f"  impressions: {int(gsc_summary['impressions']):,}")
+    rprint(f"  CTR: {gsc_summary['ctr']:.2f}%")
+    rprint(f"  position: {gsc_summary['position']:.2f}")
+
+    queries_table = Table(title="Top EN queries")
+    queries_table.add_column("query")
+    queries_table.add_column("clicks", justify="right")
+    queries_table.add_column("impr", justify="right")
+    queries_table.add_column("ctr_%", justify="right")
+    queries_table.add_column("pos", justify="right")
+    for row in gsc_summary["top_queries"]:
+        queries_table.add_row(
+            str(row.get("query", "")),
+            str(int(row.get("clicks", 0.0) or 0.0)),
+            str(int(row.get("impressions", 0.0) or 0.0)),
+            f"{float(row.get('ctr', 0.0) or 0.0):.2f}",
+            f"{float(row.get('position', 0.0) or 0.0):.2f}",
+        )
+    rprint(queries_table)
+
+    pages_table = Table(title="Top EN pages")
+    pages_table.add_column("page")
+    pages_table.add_column("clicks", justify="right")
+    pages_table.add_column("impr", justify="right")
+    pages_table.add_column("ctr_%", justify="right")
+    pages_table.add_column("pos", justify="right")
+    for row in gsc_summary["top_pages"]:
+        pages_table.add_row(
+            str(row.get("page", "")),
+            str(int(row.get("clicks", 0.0) or 0.0)),
+            str(int(row.get("impressions", 0.0) or 0.0)),
+            f"{float(row.get('ctr', 0.0) or 0.0):.2f}",
+            f"{float(row.get('position', 0.0) or 0.0):.2f}",
+        )
+    rprint(pages_table)
+
+    metrika_summary = report["metrika_signup_success"]
+    rprint("\n[bold]Metrika signup_success:[/bold]")
+    rprint(f"  EN organic signups: {int(metrika_summary['en_organic_signups']):,}")
+
+    sources_table = Table(title="signup_success by source")
+    sources_table.add_column("source")
+    sources_table.add_column("visits", justify="right")
+    sources_table.add_column("goal_visits", justify="right")
+    sources_table.add_column("goal_cr_pct", justify="right")
+    for row in metrika_summary["by_source"]:
+        sources_table.add_row(
+            str(row.get("source", "")),
+            str(int(row.get("visits", 0.0) or 0.0)),
+            str(int(row.get("goal_visits", 0.0) or 0.0)),
+            f"{float(row.get('goal_cr_pct', 0.0) or 0.0):.2f}",
+        )
+    rprint(sources_table)
 
 
 @app.command("analyze-gsc-queries")
