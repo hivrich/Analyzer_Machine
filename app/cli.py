@@ -29,6 +29,11 @@ from app.analysis_goals import (
     workbook_filename as goals_workbook_filename,
 )
 from app.en_seo_report import create_en_seo_weekly_report, save_report
+from app.seo_activation_funnel import (
+    create_seo_activation_funnel_report,
+    load_product_activation_by_landing_page,
+    save_report as save_seo_activation_funnel_report,
+)
 from app.analysis_pages import (
     calculate_contributions as calculate_contributions_pages,
     compare_pages_periods,
@@ -858,6 +863,171 @@ def en_seo_weekly_report_cmd(
             f"{float(row.get('goal_cr_pct', 0.0) or 0.0):.2f}",
         )
     rprint(sources_table)
+
+
+@app.command("seo-activation-funnel")
+def seo_activation_funnel_cmd(
+    client: str = typer.Argument(..., help="Имя папки в clients/<client>/"),
+    date1: str = typer.Argument(..., help="Начальная дата (YYYY-MM-DD)"),
+    date2: str = typer.Argument(..., help="Конечная дата (YYYY-MM-DD)"),
+    limit: int = typer.Option(50, "--limit", help="Лимит landing pages в отчёте"),
+    refresh: bool = typer.Option(False, "--refresh", help="Принудительно перезапросить GSC и Метрику"),
+    product_db_url_env: str = typer.Option("STAS_DATABASE_URL", "--product-db-url-env", help="Имя env-переменной с URL продуктовой БД"),
+    format: str = typer.Option("table", "--format", help="Формат вывода: table или json"),
+):
+    """SEO activation funnel: GSC + органическая Метрика + optional product DB по landing page."""
+    if format not in {"table", "json"}:
+        rprint("[bold red]Error:[/bold red] --format должен быть table или json")
+        raise typer.Exit(code=1)
+
+    try:
+        cfg, _ = load_client_config(client)
+    except Exception as e:
+        rprint(f"[bold red]Error:[/bold red] Не удалось загрузить конфиг: {e}")
+        raise typer.Exit(code=1)
+
+    if cfg.counter_id <= 0:
+        rprint("[bold red]Error:[/bold red] metrika.counter_id не задан в config.yaml")
+        raise typer.Exit(code=1)
+
+    resolved_goal_id = int(cfg.goal_id or 0)
+    if resolved_goal_id <= 0:
+        rprint("[bold red]Error:[/bold red] metrika.goal_id не задан в config.yaml")
+        raise typer.Exit(code=1)
+
+    token = os.getenv("YANDEX_METRIKA_TOKEN")
+    if not token:
+        rprint("[bold red]Error:[/bold red] YANDEX_METRIKA_TOKEN не задан в окружении")
+        raise typer.Exit(code=1)
+
+    try:
+        gsc = _get_gsc_client(cfg)
+    except Exception as e:
+        rprint(f"[bold red]Error:[/bold red] {e}")
+        raise typer.Exit(code=1)
+
+    metrika = MetrikaClient(token=token, counter_id=cfg.counter_id)
+
+    try:
+        gsc_pages, _ = load_or_fetch_gsc(
+            client=client,
+            kind="pages",
+            date1=date1,
+            date2=date2,
+            limit=5000,
+            refresh=refresh,
+            gsc_client=gsc,
+        )
+        metrika_organic_pages = load_or_fetch_pages_by_source(
+            client=client,
+            date1=date1,
+            date2=date2,
+            source="Search engine traffic",
+            limit=5000,
+            refresh=refresh,
+            metrika_client=metrika,
+        )
+        goals_by_source_page = load_or_fetch_goals_by_source_page(
+            client=client,
+            date1=date1,
+            date2=date2,
+            goal_id=resolved_goal_id,
+            limit=5000,
+            refresh=refresh,
+            metrika_client=metrika,
+        )
+    except RuntimeError as e:
+        error_msg = str(e)
+        for secret in [token, getattr(gsc, "client_id", ""), getattr(gsc, "client_secret", ""), getattr(gsc, "refresh_token", "")]:
+            if secret and secret in error_msg:
+                error_msg = error_msg.replace(secret, "***")
+        if "OAuth" in error_msg:
+            error_msg = error_msg.split("OAuth")[0] + "OAuth ***"
+        rprint(f"[bold red]Error:[/bold red] API error: {error_msg[:500]}")
+        raise typer.Exit(code=1)
+    except Exception as e:
+        rprint(f"[bold red]Error:[/bold red] Не удалось собрать GSC/Метрику: {e}")
+        raise typer.Exit(code=1)
+
+    product_db = load_product_activation_by_landing_page(
+        date1=date1,
+        date2=date2,
+        env_var=product_db_url_env,
+    )
+
+    report = create_seo_activation_funnel_report(
+        client=client,
+        site_url=cfg.gsc_site_url,
+        counter_id=cfg.counter_id,
+        goal_id=resolved_goal_id,
+        date1=date1,
+        date2=date2,
+        gsc_pages=gsc_pages,
+        metrika_organic_pages=metrika_organic_pages,
+        goals_by_source_page=goals_by_source_page,
+        product_db=product_db,
+        limit=limit,
+        refresh_used=refresh,
+        product_db_url_env=product_db_url_env,
+    )
+    report_file = save_seo_activation_funnel_report(client, report, date1, date2)
+
+    if format == "json":
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return
+
+    rprint(f"[green]SEO activation funnel сохранён:[/green] {report_file}")
+    if not report["product_db"]["available"]:
+        rprint(
+            f"[yellow]Product DB недоступна:[/yellow] {report['product_db']['reason']} "
+            f"(env: {report['product_db']['env_var']})"
+        )
+
+    totals = report["totals"]
+    rprint("\n[bold]Totals:[/bold]")
+    rprint(
+        f"  GSC clicks: {int(totals['gsc_clicks']):,}; "
+        f"Metrika organic visits: {int(totals['metrika_organic_visits']):,}; "
+        f"signup goal: {int(totals['metrika_signup_goal']):,}; "
+        f"product signups: {int(totals['product_signups']):,}"
+    )
+
+    table = Table(title=f"SEO activation funnel ({client}, {date1} - {date2})")
+    table.add_column("landingPage")
+    table.add_column("GSC clicks", justify="right")
+    table.add_column("impr", justify="right")
+    table.add_column("CTR %", justify="right")
+    table.add_column("pos", justify="right")
+    table.add_column("organic visits", justify="right")
+    table.add_column("users", justify="right")
+    table.add_column("goal", justify="right")
+    table.add_column("goal CR %", justify="right")
+    table.add_column("signups", justify="right")
+    table.add_column("intervals", justify="right")
+    table.add_column("AI connected", justify="right")
+    table.add_column("data req", justify="right")
+    table.add_column("training", justify="right")
+
+    for row in report["rows"]:
+        product = row["product"]
+        ai_connected = int(product.get("gpt_connected", 0) or 0) + int(product.get("claude_connected", 0) or 0)
+        table.add_row(
+            str(row.get("landingPage", "")),
+            str(int(row["gsc"].get("clicks", 0.0) or 0.0)),
+            str(int(row["gsc"].get("impressions", 0.0) or 0.0)),
+            f"{float(row['gsc'].get('ctr', 0.0) or 0.0):.2f}",
+            f"{float(row['gsc'].get('position', 0.0) or 0.0):.2f}",
+            str(int(row["metrika"].get("organic_visits", 0.0) or 0.0)),
+            str(int(row["metrika"].get("organic_users", 0.0) or 0.0)),
+            str(int(row["metrika"].get("signup_goal", 0.0) or 0.0)),
+            f"{float(row['metrika'].get('signup_goal_cr', 0.0) or 0.0):.2f}",
+            str(int(product.get("signups", 0) or 0)),
+            str(int(product.get("intervals_connected", 0) or 0)),
+            str(ai_connected),
+            str(int(product.get("first_data_request", 0) or 0)),
+            str(int(product.get("training_processed", 0) or 0)),
+        )
+    rprint(table)
 
 
 @app.command("analyze-gsc-queries")
